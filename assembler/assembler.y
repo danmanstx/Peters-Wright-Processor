@@ -111,7 +111,7 @@ void opr_conv_6(int val, char* buf) {
 
 //print 8-bit binary numbers
 void opr_conv_8(int val, char* buf) {
-    if(val > 127 || val < -128) {
+    if(val > 255 || val < -128) {
         yyerror_nonfatal("invalid immediate");
         buf = "00000000";
         return;
@@ -119,7 +119,12 @@ void opr_conv_8(int val, char* buf) {
     
     bool neg = false;
     
-    if(val < 0) {
+    if(val >= 128) {
+        //unsigned positive
+        val -= 128;
+        buf[0] = '1';
+    } else if(val < 0) {
+        //negative
         neg = true;
         val = abs(val) - 1;
         buf[0] = '1';
