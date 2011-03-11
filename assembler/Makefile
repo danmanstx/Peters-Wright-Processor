@@ -29,5 +29,5 @@ main.o: main.cc
 lex.yy.o main.o: assembler.tab.h
 
 clean:
-	rm -f *.o *~ lex.yy.c assembler.tab.c assembler.tab.h assembler
+	rm -f *.o *~ lex.yy.c assembler.tab.c assembler.tab.h assembler.output assembler
 	

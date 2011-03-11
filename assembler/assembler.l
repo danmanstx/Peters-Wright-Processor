@@ -64,6 +64,7 @@ I_LINE_COMMENT "\""([^\n])*
 "("	    	        {line += yytext; return '('; }
 ")"                 {line += yytext; return ')'; }
 ","                 {line += yytext; return ','; }
+":"                 {line += yytext; return ':'; }
 [ \t]*		        {line += yytext; }
 [\n]		        {
                         line_toprint = line;

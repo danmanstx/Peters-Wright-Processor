@@ -25,6 +25,8 @@ extern FILE* debugout;
 extern bool flag_debug;
 extern bool flag_verbose;
 extern string line_toprint;
+int addr = 0;
+bool two_word = false;
 
 bool flag_error = false;        //error flag.  Do not generate ouput if true
 
@@ -212,7 +214,7 @@ void opr_conv_8(int val, char* buf) {
 
 %%
 
-program:            instructions {
+program:            instructions EF {
                         if(!flag_error) {
                             fprintf(outfile,$1.c_str());
                         }
@@ -226,11 +228,20 @@ instructions:       instructions instruction_ {
 instruction_:       instruction END {
                         $$ = $1 + "\n";
                         if(flag_debug) {
-                            fprintf(debugout,("%d     " + line_toprint + "\n" + $1 + "\n\n").c_str(),yylineno-1);
+                            fprintf(debugout,("@%03d\n%d     " + line_toprint + "\n" +
+                                $1 + "\n\n").c_str(),addr,yylineno-1);
                         }
                         if(flag_verbose) {
-                            printf(("%d     " + line_toprint + "\n" + $1 + "\n\n").c_str(),yylineno-1);
+                            printf(("@%03d\n%d     " + line_toprint + "\n" +
+                                $1 + "\n\n").c_str(),addr,yylineno-1);
                         }
+                        if(two_word) {
+                            addr += 2;
+                            two_word = false;
+                        } else {
+                            addr += 1;
+                        }
+                        
                     } |
                     
                     END {
@@ -294,10 +305,12 @@ instruction:        AND alu_opr {
                     } |
                     
                     LDR num_4 ',' '#' num_8{
+                        two_word = true;
                         $$ = OP_LDR + $2 + "000000\n" + $5 + "00000000";
                     } |
                     
                     STR num_4 ',' '#' num_8{
+                        two_word = true;
                         $$ = OP_STR + $2 + "000000\n" + $5 + "00000000";
                     } |
                     
@@ -316,6 +329,11 @@ instruction:        AND alu_opr {
                     num_16 {
                         //manually enter instructions
                         $$ = $1;
+                    } |
+                    
+                    LBL ':' {
+                        //label declaration
+                        //TODO
                     };
                     
 alu_opr:            num_4 ',' num_4 {
@@ -325,6 +343,7 @@ alu_opr:            num_4 ',' num_4 {
                     
                     num_4 ',' '#' num_8 {
                         //immediate addressing mode
+                        two_word = true;
                         $$ = "11" + $1 + "000000\n" + $4 + "00000000";
                     } |
                     
@@ -335,6 +354,7 @@ alu_opr:            num_4 ',' num_4 {
                     
                     num_4 ',' num_4 '(' num_8 ')' {
                         //displacement addressing mode
+                        two_word = true;
                         $$ = "11" + $1 + $3 + "00\n" + $5 + "00000000";
                     };
 
