@@ -269,43 +269,43 @@ instruction:        AND alu_opr {
                     } |
                     
                     JMP '#' num_8 {
-                        $$ = OP_JMP + $2 + "00";
+                        $$ = OP_JMP + $3 + "00";
                     } |
                     
-                    CALL {
-                    
+                    CALL '#' num_8 {
+                        $$ = OP_CALL + $3 + "00";
                     } |
                     
                     RTS {
-
+                        $$ = OP_RTS + string("0000000000");
                     } |
                     
                     ISR {
-
+                        $$ = OP_ISR + string("0000000000");
                     } |
                     
                     MOV mov_opr {
-                    
+                        $$ = OP_MOV + $2;
                     } |
                     
-                    LDR {
-                    
+                    LDR num_4 ',' '#' num_8{
+                        $$ = OP_LDR + $2 + "000000\n" + $5 + "00000000";
                     } |
                     
-                    STR {
-                    
+                    STR num_4 ',' '#' num_8{
+                        $$ = OP_STR + $2 + "000000\n" + $5 + "00000000";
                     } |
                     
-                    LMR {
-                    
+                    LMR num_4 {
+                        $$ = OP_LMR + $2 + "000000";
                     } |
                     
-                    IN {
-                    
+                    IN num_4 {
+                        $$ = OP_IN + $2 + "000000";
                     } |
                     
-                    OUT {
-                    
+                    OUT num_4 {
+                        $$ = OP_OUT + $2 + "000000";
                     } |
                     
                     num_16 {
@@ -340,7 +340,7 @@ br_opr:             num_4 ',' num_6 {
                     
                     '(' num_4 ')' ',' num_6 {
                         //register indirect addressing mode
-                        $$ = "1" + $1 + $3;
+                        $$ = "1" + $2 + $5;
                     };
 
 mov_opr:            num_4 ',' num_4 {
@@ -350,7 +350,7 @@ mov_opr:            num_4 ',' num_4 {
                     
                     num_4 ',' '(' num_4 ')' {
                         //register indirect addressing mode
-                        $$ = "1" + $1 + $3 + "00";
+                        $$ = "1" + $1 + $4 + "00";
                     };
 
 num_4:              DEC {
