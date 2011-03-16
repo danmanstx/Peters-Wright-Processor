@@ -23,7 +23,7 @@ using namespace std;
 extern int yyparse();
 extern FILE* yyin;
 FILE* outfile;
-FILE* debugout;
+FILE* debugfile;
 bool flag_debug;
 bool flag_verbose;
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
         if(strcmp(argv[1],"-d") == 0) {
             //enable debug output
             flag_debug = true;
-            debugout = fopen("out_debug.txt","w");
+            debugfile = fopen("out_debug.txt","w");
             yyin = fopen(argv[2],"r");
             outfile = fopen("out.bin","w");
         
@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
             //enable verbose and debug output
             flag_verbose = true;
             flag_debug = true;
-            debugout = fopen("out_debug.txt","w");
+            debugfile = fopen("out_debug.txt","w");
             yyin = fopen(argv[2],"r");
             outfile = fopen("out.bin","w");
             
@@ -72,7 +72,7 @@ int main(int argc, char** argv) {
         if(strcmp(argv[1],"-d") == 0) {
             //enable debug output
             flag_debug = true;
-            debugout = fopen("out_debug.txt","w");
+            debugfile = fopen("out_debug.txt","w");
             yyin = fopen(argv[3],"r");
             outfile = fopen(argv[2],"w");
         
@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
             //enable verbose and debug output
             flag_verbose = true;
             flag_debug = true;
-            debugout = fopen("out_debug.txt","w");
+            debugfile = fopen("out_debug.txt","w");
             yyin = fopen(argv[3],"r");
             outfile = fopen(argv[2],"w");
             
@@ -109,6 +109,6 @@ int main(int argc, char** argv) {
     fclose(yyin);
     fclose(outfile);
     if(flag_debug)
-        fclose(debugout);
+        fclose(debugfile);
     
 }

@@ -21,14 +21,29 @@ extern int yylex(void);
 extern int yylineno;
 extern char *yytext;
 extern FILE* outfile;
-extern FILE* debugout;
+extern FILE* debugfile;
 extern bool flag_debug;
 extern bool flag_verbose;
 extern string line_toprint;
+string debug_string = "";
+char debug_temp[512];
 int addr = 0;
 bool two_word = false;
-
 bool flag_error = false;        //error flag.  Do not generate ouput if true
+bool flag_label = false;
+
+struct label {
+    char name[16];
+    int addr;
+    bool declared;
+    int instances[16];
+    bool is_six[16];
+    int cnt;
+};
+
+//only support 32 unique labels
+struct label labels[32];
+int labelcount = 0;
 
 //error function
 int yyerror(char *msg)
@@ -151,6 +166,77 @@ void opr_conv_8(int val, char* buf) {
     return;
 }
 
+
+//---------------------------------------------------------------------------
+//Label functions
+//---------------------------------------------------------------------------
+
+//create a label
+void label_create(char* name, int address) {
+    //Max 15 chars long
+    if(strlen(name) == 0 || strlen(name) > 15) {
+        yyerror("invalid label");
+        //exits
+    }
+    for(int i = 0; i < labelcount; i++) {
+        if(strcmp(labels[i].name,name) == 0) {
+            if(labels[i].declared) {
+                //already exists, exit
+                yyerror("label redeclaration");
+            }
+            else {
+                labels[i].declared = true;
+                labels[i].addr = address;
+                return;
+            }
+        }
+    }
+    if(labelcount > 31) {
+        //exit
+        yyerror("too many labels (max 32)");
+    }
+    strcpy(labels[labelcount].name,name);
+    labels[labelcount].declared = true;
+    labels[labelcount].addr = address;
+    labels[labelcount].cnt = 0;
+    labelcount += 1;
+    return;
+}
+
+//reference a label
+void label_check(char* name, int address, bool is_six) {
+    if(strlen(name) == 0 || strlen(name) > 15) {
+        yyerror("invalid label");
+        //exits
+    }
+    for(int i = 0; i < labelcount; i++) {
+        if(strcmp(labels[i].name,name) == 0) {
+            if(labels[i].declared) {
+                //label declared
+                if(labels[labelcount].cnt > 15) {
+                    yyerror("too many references to label (max 16)");
+                    //exits
+                }
+                labels[labelcount].is_six[labels[labelcount].cnt] = is_six;
+                labels[labelcount].instances[labels[labelcount].cnt++] = address;
+                return;
+            }
+            
+        }
+    }
+    if(labelcount > 31) {
+        //exit
+        yyerror("too many labels (max 32)");
+    }
+    strcpy(labels[labelcount].name,name);
+    labels[labelcount].declared = false;
+    labels[labelcount].cnt = 1;
+    labels[labelcount].instances[0] = address;
+    labels[labelcount].is_six[0] = is_six;
+    labelcount += 1;
+    return;
+}
+
 //---------------------------------------------------------------------------
 //Opcode definitions
 //---------------------------------------------------------------------------
@@ -218,6 +304,12 @@ program:            instructions EF {
                         if(!flag_error) {
                             fprintf(outfile,$1.c_str());
                         }
+                        if(flag_debug) {
+                            fprintf(debugfile,debug_string.c_str());
+                        }
+                        if(flag_verbose) {
+                            printf(debug_string.c_str());
+                        }
                         return 0;
                     };
 
@@ -226,115 +318,130 @@ instructions:       instructions instruction_ {
                     } | {/*nullable*/};
                     
 instruction_:       instruction END {
-                        $$ = $1 + "\n";
-                        if(flag_debug) {
-                            fprintf(debugout,("@%03d\n%d     " + line_toprint + "\n" +
+                        $$ = $1;
+                        if(flag_debug || flag_verbose) {
+                            sprintf(debug_temp,("@%02Xh\n%d     " + line_toprint + "\n" +
                                 $1 + "\n\n").c_str(),addr,yylineno-1);
+                            debug_string += debug_temp;
                         }
-                        if(flag_verbose) {
-                            printf(("@%03d\n%d     " + line_toprint + "\n" +
-                                $1 + "\n\n").c_str(),addr,yylineno-1);
+                        if(flag_label) {
+                            flag_label = false;
                         }
-                        if(two_word) {
+                        else if(two_word) {
                             addr += 2;
                             two_word = false;
-                        } else {
+                        }
+                        else {
                             addr += 1;
                         }
                         
                     } |
                     
                     END {
-                        $$ = "\n";
+                        $$ = "";
                     };
                     
 instruction:        AND alu_opr {
-                        $$ = OP_AND + $2;
+                        $$ = OP_AND + $2 + "\n";
                     } |
                     
                     ADD alu_opr {
-                        $$ = OP_ADD + $2;
+                        $$ = OP_ADD + $2 + "\n";
                     } |
                     
                     SUB alu_opr {
-                        $$ = OP_SUB + $2;
+                        $$ = OP_SUB + $2 + "\n";
                     } |
                     
                     OR alu_opr {
-                        $$ = OP_OR + $2;
+                        $$ = OP_OR + $2 + "\n";
                     } |
                     
                     NOT alu_opr {
-                        $$ = OP_NOT + $2;
+                        $$ = OP_NOT + $2 + "\n";
                     } |
                     
                     LSL alu_opr {
-                        $$ = OP_LSL + $2;
+                        $$ = OP_LSL + $2 + "\n";
                     } |
                     
                     LSR alu_opr {
-                        $$ = OP_LSR + $2;
+                        $$ = OP_LSR + $2 + "\n";
                     } |
                     
                     BNE br_opr {
-                        $$ = OP_BNE + $2;
+                        $$ = OP_BNE + $2 + "\n";
                     } |
                     
                     BLT br_opr {
-                        $$ = OP_BLT + $2;
+                        $$ = OP_BLT + $2 + "\n";
                     } |
                     
                     JMP '#' num_8 {
-                        $$ = OP_JMP + $3 + "00";
+                        $$ = OP_JMP + $3 + "00\n";
+                    } |
+                    
+                    JMP LBL {
+                        //label jump
+                        label_check(yytext,addr,false);
+                        $$ = OP_JMP + string("--------00\n");
                     } |
                     
                     CALL '#' num_8 {
-                        $$ = OP_CALL + $3 + "00";
+                        $$ = OP_CALL + $3 + "00\n";
+                    } |
+                    
+                    CALL LBL {
+                        //label call
+                        label_check(yytext,addr,false);
+                        $$ = OP_CALL + string("--------00\n");
                     } |
                     
                     RTS {
-                        $$ = OP_RTS + string("0000000000");
+                        $$ = OP_RTS + string("0000000000\n");
                     } |
                     
                     ISR {
-                        $$ = OP_ISR + string("0000000000");
+                        $$ = OP_ISR + string("0000000000\n");
                     } |
                     
                     MOV mov_opr {
-                        $$ = OP_MOV + $2;
+                        $$ = OP_MOV + $2 + "\n";
                     } |
                     
                     LDR num_4 ',' '#' num_8{
                         two_word = true;
-                        $$ = OP_LDR + $2 + "000000\n" + $5 + "00000000";
+                        $$ = OP_LDR + $2 + "000000\n" + $5 + "00000000\n";
                     } |
                     
                     STR num_4 ',' '#' num_8{
                         two_word = true;
-                        $$ = OP_STR + $2 + "000000\n" + $5 + "00000000";
+                        $$ = OP_STR + $2 + "000000\n" + $5 + "00000000\n";
                     } |
                     
                     LMR num_4 {
-                        $$ = OP_LMR + $2 + "000000";
+                        $$ = OP_LMR + $2 + "000000\n";
                     } |
                     
                     IN num_4 {
-                        $$ = OP_IN + $2 + "000000";
+                        $$ = OP_IN + $2 + "000000\n";
                     } |
                     
                     OUT num_4 {
-                        $$ = OP_OUT + $2 + "000000";
+                        $$ = OP_OUT + $2 + "000000\n";
                     } |
                     
                     num_16 {
                         //manually enter instructions
-                        $$ = $1;
+                        $$ = $1 + "\n";
                     } |
                     
-                    LBL ':' {
+                    LBL {
                         //label declaration
-                        //TODO
-                    };
+                        cout << yytext << endl;
+                        label_create(yytext,addr);
+                        flag_label = true;
+                    } ':';
                     
 alu_opr:            num_4 ',' num_4 {
                         //direct addressing mode
@@ -366,6 +473,18 @@ br_opr:             num_4 ',' num_6 {
                     '(' num_4 ')' ',' num_6 {
                         //register indirect addressing mode
                         $$ = "1" + $2 + $5;
+                    } |
+                    
+                    num_4 ',' LBL {
+                        //direct addressing w/ label
+                        label_check(yytext,addr,true);
+                        $$ = "0" + $1 + "------";
+                    } |
+                    
+                    '(' num_4 ')' ',' LBL {
+                        //reg. indirect w/ label
+                        label_check(yytext,addr,true);
+                        $$ = "1" + $2 + "------";
                     };
 
 mov_opr:            num_4 ',' num_4 {
@@ -379,42 +498,47 @@ mov_opr:            num_4 ',' num_4 {
                     };
 
 num_4:              DEC {
-                        char buf[4];
+                        char buf[5];
+                        buf[4] = '\0';
                         int val = strtol(yytext,NULL,10);
                         opr_conv_4(val,buf);
                         $$ = string(buf);   
                     } |
                     
                     HEX {
-                        char buf[4];
+                        char buf[5];
+                        buf[4] = '\0';
                         int val = strtol(yytext+1,NULL,16);
                         opr_conv_4(val,buf);
                         $$ = string(buf);  
                     };
 
 num_6:              DEC {
-                        char buf[6];
+                        char buf[7];
+                        buf[6] = '\0';
                         int val = strtol(yytext,NULL,10);
                         opr_conv_6(val,buf);
                         $$ = string(buf);
                     } |
                     
                     HEX {
-                        char buf[6];
+                        char buf[7];
                         int val = strtol(yytext+1,NULL,16);
                         opr_conv_6(val,buf);
                         $$ = string(buf);
                     };
                     
 num_8:              DEC {
-                        char buf[8];
+                        char buf[9];
+                        buf[8] = '\0';
                         int val = strtol(yytext,NULL,10);
                         opr_conv_8(val,buf);
                         $$ = string(buf);
                     } |
                     
                     HEX {
-                        char buf[8];
+                        char buf[9];
+                        buf[8] = '\0';
                         int val = strtol(yytext+1,NULL,16);
                         opr_conv_8(val,buf);                        
                         $$ = string(buf);
@@ -428,7 +552,7 @@ num_16:             BIN {
                         else {
                             $$ = string(yytext+1);
                         }
-                    };                    
+                    };               
                     
                     
 %%

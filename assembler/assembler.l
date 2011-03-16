@@ -28,7 +28,7 @@ d		[0-9]
 bin     "%"{b}+
 dec		(-)?{d}+
 hex     "$"[0-9a-fA-F]+
-str		[a-zA-Z][a-zA-Z0-9]*
+lbl		[a-zA-Z][_a-zA-Z0-9]*
 
 I_LINE_COMMENT "\""([^\n])*
 
@@ -55,7 +55,7 @@ I_LINE_COMMENT "\""([^\n])*
 "in"                {line += yytext; return IN; }
 "out"               {line += yytext; return OUT; }
 
-{str}               {line += yytext; return LBL; }
+{lbl}               {line += yytext; return LBL; }
 {bin}               {line += yytext; return BIN; }
 {dec}               {line += yytext; return DEC; }
 {hex}               {line += yytext; return HEX; }
