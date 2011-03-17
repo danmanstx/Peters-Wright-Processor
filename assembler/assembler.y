@@ -31,6 +31,7 @@ int addr = 0;
 bool two_word = false;
 bool flag_error = false;        //error flag.  Do not generate ouput if true
 bool flag_label = false;
+bool flag_label_call = false;
 
 struct label {
     char name[16];
@@ -38,12 +39,14 @@ struct label {
     bool declared;
     int instances[16];
     bool is_six[16];
+    long debug_ptrs[16];
     int cnt;
 };
 
 //only support 32 unique labels
 struct label labels[32];
 int labelcount = 0;
+label *lastlabel;
 
 //error function
 int yyerror(char *msg)
@@ -213,12 +216,14 @@ void label_check(char* name, int address, bool is_six) {
         if(strcmp(labels[i].name,name) == 0) {
             if(labels[i].declared) {
                 //label declared
-                if(labels[labelcount].cnt > 15) {
+                if(labels[i].cnt > 15) {
                     yyerror("too many references to label (max 16)");
                     //exits
                 }
-                labels[labelcount].is_six[labels[labelcount].cnt] = is_six;
-                labels[labelcount].instances[labels[labelcount].cnt++] = address;
+                labels[i].is_six[labels[i].cnt] = is_six;
+                labels[i].instances[labels[i].cnt] = address;
+                labels[i].cnt = labels[i].cnt + 1;
+                lastlabel = &(labels[i]);
                 return;
             }
             
@@ -233,8 +238,49 @@ void label_check(char* name, int address, bool is_six) {
     labels[labelcount].cnt = 1;
     labels[labelcount].instances[0] = address;
     labels[labelcount].is_six[0] = is_six;
+    lastlabel = &(labels[labelcount]);
     labelcount += 1;
     return;
+}
+
+//replace label placeholder
+void label_replace(string& s, int labelno, int count) {
+    int offset = labels[labelno].addr - labels[labelno].instances[count];
+    //check if 16 bit
+    if(labels[labelno].is_six[count]) {
+        if(offset > 31 || offset < -32) {
+            yyerror_nonfatal("branch distance too large");
+            return;
+        }
+        //convert offset to string in buffer
+        char buf[7];
+        opr_conv_6(offset,buf);
+        buf[6] = '\0';
+        //copy buffer to s
+        s.insert((17 * (labels[labelno].instances[count])) + 10,buf);
+        s.erase((17 * (labels[labelno].instances[count])) + 16,6);
+        if(flag_debug || flag_verbose) {
+            debug_string.insert(labels[labelno].debug_ptrs[count] - 9,buf);
+            debug_string.erase(labels[labelno].debug_ptrs[count] - 3,6);
+        }
+    }
+    else {
+        if(offset > 127 || offset < -128) {
+            yyerror_nonfatal("jump distance too large");
+            return;
+        }
+        //convert offset to string in buffer
+        char buf[9];
+        opr_conv_8(offset,buf);
+        buf[8] = '\0';
+        //copy buffer to s
+        s.insert((17 * (labels[labelno].instances[count])) + 6,buf);
+        s.erase((17 * (labels[labelno].instances[count])) + 14,8);
+        if(flag_debug || flag_verbose) {
+            debug_string.insert(labels[labelno].debug_ptrs[count] - 13,buf);
+            debug_string.erase(labels[labelno].debug_ptrs[count] - 5,8);
+        }      
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -301,6 +347,12 @@ void label_check(char* name, int address, bool is_six) {
 %%
 
 program:            instructions EF {
+                        //manage labels
+                        for(int i = 0; i < labelcount; i += 1) {
+                            for(int j = 0; j < labels[i].cnt; j += 1) {
+                                label_replace($1,i,j);
+                            }
+                        }
                         if(!flag_error) {
                             fprintf(outfile,$1.c_str());
                         }
@@ -323,6 +375,10 @@ instruction_:       instruction END {
                             sprintf(debug_temp,("@%02Xh\n%d     " + line_toprint + "\n" +
                                 $1 + "\n\n").c_str(),addr,yylineno-1);
                             debug_string += debug_temp;
+                            if(flag_label_call) {
+                                lastlabel->debug_ptrs[lastlabel->cnt-1] = debug_string.size();
+                                flag_label_call = false;
+                            }
                         }
                         if(flag_label) {
                             flag_label = false;
@@ -384,6 +440,7 @@ instruction:        AND alu_opr {
                     JMP LBL {
                         //label jump
                         label_check(yytext,addr,false);
+                        flag_label_call = true;
                         $$ = OP_JMP + string("--------00\n");
                     } |
                     
@@ -394,6 +451,7 @@ instruction:        AND alu_opr {
                     CALL LBL {
                         //label call
                         label_check(yytext,addr,false);
+                        flag_label_call = true;
                         $$ = OP_CALL + string("--------00\n");
                     } |
                     
@@ -438,7 +496,6 @@ instruction:        AND alu_opr {
                     
                     LBL {
                         //label declaration
-                        cout << yytext << endl;
                         label_create(yytext,addr);
                         flag_label = true;
                     } ':';
@@ -478,12 +535,14 @@ br_opr:             num_4 ',' num_6 {
                     num_4 ',' LBL {
                         //direct addressing w/ label
                         label_check(yytext,addr,true);
+                        flag_label_call = true;
                         $$ = "0" + $1 + "------";
                     } |
                     
                     '(' num_4 ')' ',' LBL {
                         //reg. indirect w/ label
                         label_check(yytext,addr,true);
+                        flag_label_call = true;
                         $$ = "1" + $2 + "------";
                     };
 
