@@ -265,12 +265,13 @@ void label_replace(string& s, int labelno, int count) {
         }
     }
     else {
-        if(offset > 127 || offset < -128) {
+        if(offset > 255 || offset < -128) {
             yyerror_nonfatal("jump distance too large");
             return;
         }
         //convert offset to string in buffer
         char buf[9];
+        offset = labels[labelno].addr;
         opr_conv_8(offset,buf);
         buf[8] = '\0';
         //copy buffer to s
