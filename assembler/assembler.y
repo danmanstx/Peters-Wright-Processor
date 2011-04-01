@@ -303,7 +303,7 @@ void label_replace(string& s, int labelno, int count) {
 #define OP_CALL    "100001"
 #define OP_RTS     "100010"
 #define OP_ISR     "100011"
-#define OP_MOV     "10011"
+#define OP_MOV     "1001"
 #define OP_LDR     "101000"
 #define OP_STR     "101001"
 #define OP_LMR     "101010"
