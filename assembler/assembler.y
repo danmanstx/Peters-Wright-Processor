@@ -526,10 +526,10 @@ alu_opr:            num_4 ',' num_4 {
                         $$ = "10" + $1 + $4 + "00";
                     } |
                     
-                    num_4 ',' num_4 '(' num_8 ')' {
+                    num_4 ',' '#' num_8 '(' num_4 ')' {
                         //displacement addressing mode
                         two_word = true;
-                        $$ = "11" + $1 + $3 + "00\n" + $5 + "00000000";
+                        $$ = "11" + $1 + $6 + "00\n" + $4 + "00000000";
                     };
 
 br_opr:             num_4 ',' num_6 {

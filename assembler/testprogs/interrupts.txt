@@ -1,0 +1,7 @@
+lmr $F     "enable interrupts
+ldi 0,#0    "r0 <= 0
+add 0,#0    "r0 <= 0 throws zero interrupt
+ldi 0,#$7F  "r0 <= $7F
+add 0,#1    "r0 <= $80 (-128) overflow
+%1111111111111111   "111111 illegal opcode
+"external interrupt fired in simulation with signal

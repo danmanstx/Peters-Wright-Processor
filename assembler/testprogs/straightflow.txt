@@ -1,0 +1,17 @@
+lmr #0      "disable interrupts
+ldi 0,#$0F  "r0 <= $0F
+ldi 1,#$F0  "r1 <= $F0
+add 0,1     "r0 <= $FF
+and 0,#$F8  "r0 <= $F8
+ldi 2,#3    "r2 <= $03
+str 2,#5    "m(5) <= $03
+ldi 3,#5    "r3 <= $05
+or  0,(3)   "r0 <= $FB
+ldi 4,#1    "r4 <= $01
+str 4,#7    "m(7) <= $01
+sub 0,#2(3) "r0 <= $FA
+lsr 0,#1    "r0 <= $7D
+lsl 0,#2    "r0 <= $F4
+not 0,0     "r0 <= $0B
+
+
