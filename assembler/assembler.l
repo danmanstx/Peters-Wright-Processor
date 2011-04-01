@@ -50,6 +50,7 @@ I_LINE_COMMENT "\""([^\n])*
 "isr"               {line += yytext; return ISR; }
 "mov"               {line += yytext; return MOV; }
 "ldr"               {line += yytext; return LDR; }
+"ldi"               {line += yytext; return LDI; }
 "str"               {line += yytext; return STR; }
 "lmr"               {line += yytext; return LMR; }
 "in"                {line += yytext; return IN; }

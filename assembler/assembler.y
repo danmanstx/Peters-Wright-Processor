@@ -305,10 +305,11 @@ void label_replace(string& s, int labelno, int count) {
 #define OP_ISR     "100011"
 #define OP_MOV     "1001"
 #define OP_LDR     "101000"
-#define OP_STR     "101001"
-#define OP_LMR     "101010"
-#define OP_IN      "101011"
-#define OP_OUT     "101100"
+#define OP_LDI     "101001"
+#define OP_STR     "101010"
+#define OP_LMR     "101011"
+#define OP_IN      "101100"
+#define OP_OUT     "101101"
 
 //---------------------------------------------------------------------------
 //Other definitions
@@ -342,6 +343,7 @@ void label_replace(string& s, int labelno, int count) {
 %token MOV
 %token LDR
 %token STR
+%token LDI
 %token LMR
 %token IN
 %token OUT
@@ -473,6 +475,11 @@ instruction:        AND alu_opr {
                     LDR num_4 ',' '#' num_8{
                         two_word = true;
                         $$ = OP_LDR + $2 + "000000\n" + $5 + "00000000\n";
+                    } |
+                    
+                    LDI num_4 ',' '#' num_8{
+                        two_word = true;
+                        $$ = OP_LDI + $2 + "000000\n" + $5 + "00000000\n";
                     } |
                     
                     STR num_4 ',' '#' num_8{
