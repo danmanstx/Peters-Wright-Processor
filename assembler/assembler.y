@@ -265,8 +265,10 @@ void label_replace(string& s, int labelno, int count) {
         }
     }
     else {
-        if(offset > 255 || offset < -128) {
-            yyerror_nonfatal("jump distance too large");
+        //absolute address, not relative
+        offset = labels[labelno].addr;
+        if(offset > 255 || offset < 0) {
+            yyerror_nonfatal("invalid jump");
             return;
         }
         //convert offset to string in buffer
@@ -301,12 +303,12 @@ void label_replace(string& s, int labelno, int count) {
 #define OP_CALL    "100001"
 #define OP_RTS     "100010"
 #define OP_ISR     "100011"
-#define OP_MOV     "10010"
-#define OP_LDR     "100110"
-#define OP_STR     "100111"
-#define OP_LMR     "101000"
-#define OP_IN      "101001"
-#define OP_OUT     "101010"
+#define OP_MOV     "10011"
+#define OP_LDR     "101000"
+#define OP_STR     "101001"
+#define OP_LMR     "101010"
+#define OP_IN      "101011"
+#define OP_OUT     "101100"
 
 //---------------------------------------------------------------------------
 //Other definitions
@@ -549,12 +551,22 @@ br_opr:             num_4 ',' num_6 {
 
 mov_opr:            num_4 ',' num_4 {
                         //direct addressing mode
-                        $$ = "0" + $1 + $3 + "00";
+                        $$ = "00" + $1 + $3 + "00";
                     } |
                     
                     num_4 ',' '(' num_4 ')' {
-                        //register indirect addressing mode
-                        $$ = "1" + $1 + $4 + "00";
+                        //register indirect to register addressing mode
+                        $$ = "01" + $1 + $4 + "00";
+                    } |
+                    
+                    '(' num_4 ')' ',' num_4 {
+                        //register to register indirect addressing mode
+                        $$ = "10" + $2 + $5 + "00";
+                    } |
+                    
+                    '(' num_4 ')' ',' '(' num_4 ')' {
+                        //register indirect to register indirect addressing mode
+                        $$ = "11" + $2 + $6 + "00";
                     };
 
 num_4:              DEC {
