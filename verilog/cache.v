@@ -75,7 +75,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 begin
                     if(hit == 1'b1)     //hit
                     begin
-                        if(rw == 1'b0)  //write
+                        if(rw_in == 1'b0)  //write
                             data[sel] <= data_in;
                         else            //read
                             data_in_reg <= data[sel];
@@ -105,7 +105,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 3'b001:
                 begin
                     //perform read or write for miss
-                    if(rw == 1'b0)  //write
+                    if(rw_in == 1'b0)  //write
                     begin
                         data[sel_reg] <= data_in_reg;
                     end
@@ -157,9 +157,11 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                     timer <= 3'b000;
                 end
                 default:
+                begin
                     ce_out <= 1'b0;
                     odv <= 1'b0;
                     timer <= 3'b000;
+                end
             endcase
         end
         else        //chip is disabled

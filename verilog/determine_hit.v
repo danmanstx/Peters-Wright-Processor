@@ -10,23 +10,35 @@
 //A module that is used in cache.v to choose which counters to decrement on a cache hit
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module determine_hit(addr, entry_addrs, cnt, valid, sel, dec, hit);
+module determine_hit(addr, w_entry_addrs, w_cnt, valid, sel, dec, hit);
     //parameters
     parameter d_width = 8;                  //data bus width
     parameter a_width = 8;                  //address line width
     //inputs
     input [a_width-1:0] addr;               //input address
-    input [a_width-1:0] entry_addrs [3:0];  //entry address values
-    input [1:0] cnt [3:0];                  //entry counts
+    input [(a_width*4)-1:0] w_entry_addrs;  //entry address values (as 1d vector)
+        wire [a_width-1:0] entry_addrs [3:0];   //2d wrapper
+    input [7:0] w_cnt;                      //entry counts (as 1d vector)
+        wire [1:0] cnt [3:0];                   //2d wrapper
     input [3:0] valid;                      //entry valid values
     //outputs
-    output [1:0] sel;                       //sel=i if hit at entry i, else hiZ
-    output [3:0] dec;                       //dec[i]=1 if decrementing cnt[i]
-    output hit;                             //hit=1 if hit, hit=0 if miss
+    output reg [1:0] sel;                   //sel=i if hit at entry i, else hiZ
+    output reg [3:0] dec;                   //dec[i]=1 if decrementing cnt[i]
+    output reg hit;                         //hit=1 if hit, hit=0 if miss
 
+    //assign wrappers
+    assign entry_addrs[0] = w_entry_addrs[a_width-1:0];
+    assign entry_addrs[1] = w_entry_addrs[(a_width*2)-1:a_width];
+    assign entry_addrs[2] = w_entry_addrs[(a_width*3)-1:(a_width*2)];
+    assign entry_addrs[3] = w_entry_addrs[(a_width*4)-1:(a_width*3)];
+    assign cnt[0] = w_cnt[1:0];
+    assign cnt[1] = w_cnt[3:2];
+    assign cnt[2] = w_cnt[5:4];
+    assign cnt[3] = w_cnt[7:6];
+    
     always@(addr or entry_addrs or valid)
     begin
-        else if((addr == entry_addrs[0]) && (valid[0] == 1'b1))
+        if((addr == entry_addrs[0]) && (valid[0] == 1'b1))
         begin
             //hit on entry 0
             hit = 1'b1;

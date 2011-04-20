@@ -45,8 +45,8 @@ module Processor(bus_in, ext_int, out, hsk_1, hsk_2, g_clk);
     wire [3:0]  mask_in;
     wire [23:0] psr0_out;
     // functional units
-	RAM #(.n(16),.m(8))                 I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
-	cache #(.d_width(16),.a_width(4))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
+	RAM #(.d_width(16),.a_width(8))     I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
+	cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
 	ls_reg #(.n(8))                     IMAR (imar_in[7:0], s[3], g_clr, g_clk, icache_in[7:0]);                       // 8 bit instruction memory address register
 	ls_reg #(.n(16))                    IR (icache_in[23:8], s[2], g_clr, g_clk, ir_out[15:0]);                        // 16 bit instruction register
 	sign_extend                         SEX (ir_out[5:0], sex_out[7:0]);										       // sign extend from IR to mux
