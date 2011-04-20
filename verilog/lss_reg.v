@@ -1,29 +1,28 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    12:00:43 02/07/2011 
-// Design Name: 
-// Module Name:    lss_reg 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//ls_reg.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//A parameterized load/store/shift register implementing the following control table:
+//    c    clr  funct
+//    xx   0    clear register to 0s
+//    00   1    store
+//    01   1    shift left (leftmost shifts from parallel in MSB)
+//    10   1    parallel load
+//    11   1    shift right (rightmost shifts from parallel in LSB)
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module lss_reg(in,c,clr,clk,out);
-	parameter n = 4;	//n >= 2
-	input [n-1:0] in;
-	input [1:0] c;
-	input clr,clk;
-	output [n-1:0] out;
+	parameter n;			//XXX n >= 2
+	input [n-1:0] in;		//parallel load
+	input [1:0] c;			//control
+	input clr;				//synchronous active low clear
+	input clk;				//clock
+	output [n-1:0] out;	//output
 	
 	genvar i;
 	//bitslices 0 and n-1 are different (the shift in is the input)

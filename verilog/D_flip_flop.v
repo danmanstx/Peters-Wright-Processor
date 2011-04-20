@@ -1,26 +1,21 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    12:00:59 02/04/2011 
-// Design Name: 
-// Module Name:    D_flip_flop 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//D_flip_flop.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//A D flip flop with synchronous active low clear (priority) and set.
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module D_flip_flop(d_in,clr,set,clk,q);
-	input d_in,clr,set,clk;
-	output reg q;
+	input d_in;		//input
+	input clr;		//synchronous active low clear (priority)
+	input set;		//synchronous active low set
+	input clk;		//clock
+	output reg q;	//output
 	
 	always@(posedge clk)
 	begin

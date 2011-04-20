@@ -1,28 +1,33 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    13:37:33 01/31/2011 
-// Design Name: 
-// Module Name:    ALU_bitslice 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//ALU_bitslice.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//An ALU bitslice that implements the following function table:
+//    ctrl cin  funct
+//    00   0    A+B
+//    00   1    A-B
+//    01   0    A|B
+//    01   1    A|~B
+//    10   0    A&B
+//    10   1    A&~B
+//    11   0    ~A
+//    11   1    ~B
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module ALU_bitslice(a,b,cin,ctrl,fout,cout);
-	input a,b,cin;
-	input [1:0] ctrl;
-	output fout,cout;
-	wire [7:0] w;
+	input a;				//A input
+	input b;				//B input
+	input cin;			//carry in (inverts B)
+	input [1:0] ctrl; //control inputs
+	output fout;		//F output
+	output cout;		//carry out
+	
+	wire [7:0] w;		//wires
 	
 	xor XOR0 (w[0],b,cin);	//w[0] = ~b when cin = 1, else w[0] = b
 	BFA BFA0 (a,b,cin,w[1],w[6]);

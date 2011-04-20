@@ -1,31 +1,40 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    12:54:51 02/02/2011 
-// Design Name: 
-// Module Name:    n_bit_ALU 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//n_bit_ALU.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//An ALU that implements the following function table:
+//    ctrl cin  funct
+//    00   0    A+B
+//    00   1    A-B
+//    01   0    A|B
+//    01   1    A|~B
+//    10   0    A&B
+//    10   1    A&~B
+//    11   0    ~A
+//    11   1    ~B
 //
-//////////////////////////////////////////////////////////////////////////////////
+//Having the following outputs:
+//    f     result
+//    v     v=1 if overflow
+//    z     z=1 if f=0
+//    cout  carry out
+//
+///////////////////////////////////////////////////////////////////////////////////////
 module n_bit_ALU(a,b,cin,ctrl,f,cout,v,z);
-	parameter n=4;
-	input [n-1:0] a;
-	input [n-1:0] b;
-	input cin;
-	input [1:0] ctrl;
-	output [n-1:0] f;
-	output cout,v,z;
+	parameter n;			//data width
+	input [n-1:0] a;		//A input
+	input [n-1:0] b;		//B input
+	input cin;				//carry in (inverts B)
+	input [1:0] ctrl;		//control inputs
+	output [n-1:0] f;		//output
+	output cout;			//carry out
+	output v;				//v=1 if overflow
+	output z;				//z=1 if f=0
 	
 	wire [n:0] carry;
 	wire [n-1:0] or_chain;

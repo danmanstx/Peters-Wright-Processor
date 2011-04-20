@@ -1,32 +1,29 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    12:00:20 02/07/2011 
-// Design Name: 
-// Module Name:    ls_reg 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//ls_reg.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//A parameterized load/store register implementing the following control table:
+//    c    clr  funct
+//    x    0    clear register to 0s
+//    0    1    store
+//    1    1    load from input
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module ls_reg(in,c,clr,clk,out);
-	parameter n = 4;
-	input [n-1:0] in;
-	input c,clr,clk;
-	output reg [n-1:0] out;
+	parameter n;				//register size in bits
+	input [n-1:0] in;			//load input
+	input c;						//control line
+	input clr;					//synchronous active-low clear
+	output reg [n-1:0] out; //output
 	
 	always@(posedge clk)
 	begin
-		if(clr == 0)	//clear to 0s
+		if(clr == 0)		//clear to 0s
 		begin
 			out <= 0;
 		end
@@ -34,7 +31,10 @@ module ls_reg(in,c,clr,clk,out);
 		begin
 			out <= in;
 		end
-		//otherwise value is stored
+		else					//c == 0, so store
+		begin
+			out <= out;
+		end
 	end
 	
 endmodule

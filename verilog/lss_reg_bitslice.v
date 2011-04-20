@@ -1,23 +1,21 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    12:00:35 02/07/2011 
-// Design Name: 
-// Module Name:    lss_reg_bitslice 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//ls_reg.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//A bitslice load-store-shift bitslice that uses the following function table:
+//    c    clr  funct
+//    xx   0    clear register to 0s
+//    00   1    store
+//    01   1    shift left
+//    10   1    load
+//    11   1    shift right
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module lss_reg_bitslice(in,l_in,r_in,c,clr,clk,out);
 	input in,l_in,r_in,clr,clk;
 	input [1:0] c;

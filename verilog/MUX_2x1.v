@@ -1,28 +1,21 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    09:56:12 01/24/2011 
-// Design Name: 
-// Module Name:    MUX_2x1 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//MUX_2x1.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//A 2x1 multiplexer.
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module MUX_2x1(in,sel,out);
-	input [1:0]in;
-	input sel;
-	output out;
-	wire [2:0]w;
+	input [1:0]in;	//inputs
+	input sel;		//select line
+	output out;		//output
+	
+	wire [2:0]w;	//wires
 	
 	not(w[0], sel);
 	and(w[1], in[0], w[0]);

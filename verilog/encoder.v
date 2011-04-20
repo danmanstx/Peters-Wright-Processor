@@ -1,23 +1,15 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    13:39:20 01/31/2011 
-// Design Name: 
-// Module Name:    encoder 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//encoder.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//A 4x1 priority encoder with enable line.
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module encoder(in,enable,out,valid);
 	input [3:0] in;
 	input enable;
@@ -40,6 +32,7 @@ module encoder(in,enable,out,valid);
 			end
 			else if(in[2] == 1'b1)
 			begin
+				valid = 1'b1;
 				out = 2'b10;
 			end
 			else if(in[1] == 1'b1)

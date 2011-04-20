@@ -1,29 +1,28 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    12:00:44 02/04/2011 
-// Design Name: 
-// Module Name:    n_bit_PC 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//n_bit_PC.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//A program counter with synchronous active low clear with the following functionality:
+//    ctrl clr  funct
+//    x    0    clear register to 0s
+//    00   1    store
+//    01   1    increment by input
+//    10   1    increment by 1
+//    11   1    load from input
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module n_bit_PC(ld_in,ctrl,clr,clk,out);
-	parameter n=4;
-	input [n-1:0] ld_in;
-	input [1:0] ctrl;
-	input clr,clk;
-	output reg [n-1:0] out;
+	parameter a_width;				//address width parameter
+	input [a_width-1:0] ld_in;		//load input
+	input [1:0] ctrl;					//control lines
+	input clr;							//synchronous active low clear
+	input clk;							//clear
+	output reg [a_width-1:0] out;	//PC out
 	
 	always@(posedge clk)
 	begin

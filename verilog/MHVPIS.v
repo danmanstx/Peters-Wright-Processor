@@ -1,23 +1,15 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date:    16:46:39 03/02/2011 
-// Design Name: 
-// Module Name:    MHVPIS 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//MHVPIS.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//A maskable hardware vectorized priority interrupt system.
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module MHVPIS(irupt_in, mask_in, clr, enable, i_pending, PC_out);
 	input [3:0] irupt_in;			//4-bit vector for interrupt input signals
 	input [3:0] mask_in;				//4-bit mask input vector
