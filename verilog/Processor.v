@@ -18,52 +18,65 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module Processor(in, external_interrupt, out, hsk_1, hsk_2, clk);
+module Processor(in, ext_int, out, hsk_1, hsk_2, g_clk);
 	// inputs
-        input in; 				// this is an input that is called in
-	input hsk_1; 				// this is an input used for handshaking
-	input hsk_2; 				// this is another input used for handshaking
-	input clk;				// this is the clock input
-	input external_interrupt;		// this is an external interrupt input
+    input       in;           // this is an input that is called in
+	input       hsk_1;       // this is an input used for handshaking
+	input       hsk_2;       // this is another input used for handshaking
+	input       g_clk;       // this is the clock input
+	input [3:0] ext_int;     // this is an external interrupt input
 	// outputs
-	output out;				// this is an output called out
+	output      out;        // this is an output called out
 	///////////////////
 	// controller    //
 	///////////////////
-	badasscontroller	controller (/* in and outs*/);						// this is the bad ass controller
-	MHVPIS			wtf (/*irupt_in, mask_in, clr, enable, i_pending, PC_out*/);		// hardware vector priority interrupt system
+	badasscontroller      controller (/* in and outs*/);                                 // this is the bad ass controller
+	MHVPIS                wtf ( ext_int, mask_in, g_clr, i_en, i_pending, pc_out[7:0]);  // hardware vector priority interrupt system
 	///////////////////
 	// stage one	  //
 	///////////////////
-	RAM #(.n(16),.m(8))			I_RAM (/* addr,ce,clk,clr,rw,data*/ );		// 256x16 instruction random access memory
-	cache					I_CACHE (/* in and outs*/);			// 4x16 instruction cache
-	ls_reg					IMAR (/* in and outs*/);			// 8 bit instruction memory address register
-	ls_reg					IR (/* in and outs*/);				// 16 bit instruction register
-	sign_extend				SEX (/* in, out*/ );				// sign extend from IR to mux
-	n_bit_PC #(.n(8)) 			program_counter (/*ld_in,ctrl,clr,clk,out*/);	//  8 bit program counter
-	MUX_mxn #(.d_width(8),.s_lines(2)) 	PC_MUX (/*in,sel,out*/ );			// 2x8 mux for program counter
-	MUX_mxn #(.d_width(8),.s_lines(4)) 	PSR0_MUX (/*in,sel,out*/ );			// 4x8 mux for pipelined stage register instruction
- 	ls_reg					PSR0 (/* in and outs*/ );			// pipeline stage register zero
+	//wires
+    wire [25:0] iram_in;
+    wire [23:0] icache_in;
+    wire [7:0]  imar_in;
+    wire [15:0] ir_out;
+    wire [7:0]  sex_out;
+    wire [7:0]  pc_in;
+    wire        i_pending;
+    wire [7:0]  pc_out;
+    wire [7:0]  psr0_in;
+    wire [3:0]  mask_in;
+    wire [23:0] psr0_out;
+    // 
+	RAM #(.n(16),.m(8))                 I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
+	cache #(.d_width(16),.a_width(4))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
+	ls_reg #(.n(8))                     IMAR (imar_in[7:0], s[3], g_clr, g_clk, icache_in[7:0]);                       // 8 bit instruction memory address register
+	ls_reg #(.n(16))                    IR (icache_in[23:8], s[2], g_clr, g_clk, ir_out[15:0]);                        // 16 bit instruction register
+	sign_extend                         SEX (ir_out[5:0], sex_out[7:0]);										       // sign extend from IR to mux
+	n_bit_PC #(.n(8))                   program_counter (pc_in[7:0], {s[5],s[4]}, g_clr, g_clk, imar_in[7:0]);         //  8 bit program counter
+	MUX_mxn #(.d_width(8),.s_lines(2))  PC_MUX (in, i_pending, pc_in[7:0]);                                            // 2x8 mux for program counter
+	MUX_mxn #(.d_width(8),.s_lines(4))  PSR0_MUX ({ir_out[15:7],ir_out[9:2],sex_out[7:0],8'h00}, {s[7],s[6]}, psr0_in[7:0]); // 4x8 mux for pipelined stage register instruction
+ 	ls_reg #(.n(24))                    PSR0 ({ir_out[9:6],ir_out[5:2],psr0_in[7:0],imar_in[7:0]}, s[9], g_clr, g_clk, psr0_out[23:0]);                                                      // pipeline stage register zero
 	///////////////////
 	// stage two     //
 	///////////////////
-	register_file				registerfile (/* in and outs*/ );		// register file 
-	comparator #(.width(4))			CMP_MUX_A (/* in,sel,out*/);			// comparator for mux 2x8 that feeds later into alu input A
-	comparator #(.width(8))			CMP_MUX_B (/* in,sel,out*/);			// comparator for mux 2x8 that feeds later into alu input B
-	MUX_mxn #(.d_width(8),.s_lines(2))	MUX_MUX_A (/* in,sel,out*/ );			// 2x8 mux that feeds into alu_A_MUX
-	MUX_mxn #(.d_width(8),.s_lines(2))	MUX_MUX_B (/* in,sel,out*/ );			// 2x8 mux that feeds into alu_B_MUX
-	MUX_mxn #(.d_width(8),.s_lines(2))	alu_A_MUX (/* in,sel,out*/ );			// 2x8 mux that feeds directly into alu input A
-	MUX_mxn #(.d_width(8),.s_lines(4))    	alu_B_MUX (/* in,sel,out*/ );			// 4x8 mux that feeds directly into alu input B
-	n_bit_ALU				alu (/*a,b,cin,ctrl,f,cout,v,z*/ );		// this is the all powerful ALU
-	lss_reg #(.n(8))			LSS_Ralu (/* in and outs*/);			// lss register for the alu result
-	ls_reg					PSR1(/* in and outs*/ );			// pipeline stage register one
+	
+	// register_file									registerfile (/* in and outs*/ );		// register file 
+	// comparator #(.width(4))						CMP_MUX_A (/* in,sel,out*/);				// comparator for mux 2x8 that feeds later into alu input A
+	// comparator #(.width(8))						CMP_MUX_B (/* in,sel,out*/);				// comparator for mux 2x8 that feeds later into alu input B
+	// MUX_mxn #(.d_width(8),.s_lines(2))		MUX_MUX_A (/* in,sel,out*/ );				// 2x8 mux that feeds into alu_A_MUX
+	// MUX_mxn #(.d_width(8),.s_lines(2))     MUX_MUX_B (/* in,sel,out*/ );				// 2x8 mux that feeds into alu_B_MUX
+	// MUX_mxn #(.d_width(8),.s_lines(2))		alu_A_MUX (/* in,sel,out*/ );				// 2x8 mux that feeds directly into alu input A
+	// MUX_mxn #(.d_width(8),.s_lines(4))     alu_B_MUX (/* in,sel,out*/ );				// 4x8 mux that feeds directly into alu input B
+	// n_bit_ALU										alu (/*a,b,cin,ctrl,f,cout,v,z*/ );		// this is the all powerful ALU
+	// lss_reg #(.n(8))								LSS_Ralu (/* in and outs*/);				// lss register for the alu result
+	// ls_reg											PSR1(/*in,c,clr,clk,out*/ );					// pipeline stage register one
 	///////////////////
 	// stage three   //
 	///////////////////
-	ls_reg					R_OUT (/* in and outs*/ );			// 8 bit r out
-	RAM #(.n(8),.m(8))			D_RAM (/*addr,ce,clk,clr,rw,data*/ );		// 256x8 data random access memory
-	cache					D_CACHE ( /* in and outs*/ );			// 4x8 data cache
-	MUX_mxn #(.d_width(8),.s_lines(4))		data_Cache_MUX (/* in,sel,out*/);	// 4x8 mux that feeds into the data cache address in
-	
+	// ls_reg											R_OUT (/*in,c,clr,clk,out*/ );									// 8 bit r out
+	// RAM #(.n(8),.m(8))							D_RAM (/*addr,ce,clk,clr,rw,data*/ );					// 256x8 data random access memory
+	// cache												D_CACHE ( /* in and outs*/ );								// 4x8 data cache
+	// MUX_mxn #(.d_width(8),.s_lines(4))		data_Cache_MUX (/* in,sel,out*/);						// 4x8 mux that feeds into the data cache address in
 	
 endmodule
