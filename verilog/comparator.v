@@ -24,18 +24,18 @@ module comparator(A, B, En, out);
     input [width-1:0]B;
     input En;
     output out;
-	 reg out;
-	 
-	always @ (A or B or En )
-	begin
-		if(En)
-		begin
-			assign out = A >= B ? 1'b1 :1'b0;
-		end
-		else
-		begin
-			assign out = 0;
-		end
-	end
+     reg out;
+     
+    always @ (A or B or En )
+    begin
+        if(En)
+        begin
+            assign out = A >= B ? 1'b1 :1'b0;
+        end
+        else
+        begin
+            assign out = 0;
+        end
+    end
 
 endmodule

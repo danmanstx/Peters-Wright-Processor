@@ -11,10 +11,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 module MUX_4x1(in,sel,out);
-	input [3:0]in;		//input
-	input [1:0]sel;	//select lines
-	output out;			//output
-	
-	assign out = (sel[1] & ((sel[0] & in[3]) | (~sel[0] & in[2]))) | (~sel[1] & ((sel[0] & in[1]) | (~sel[0] & in[0])));
+    input [3:0]in;      //input
+    input [1:0]sel;     //select lines
+    output out;         //output
+    
+    assign out = (sel[1] & ((sel[0] & in[3]) | (~sel[0] & in[2]))) | (~sel[1] & ((sel[0] & in[1]) | (~sel[0] & in[0])));
 
 endmodule

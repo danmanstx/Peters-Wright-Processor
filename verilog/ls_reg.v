@@ -15,26 +15,26 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 module ls_reg(in,c,clr,clk,out);
-	parameter n;				//register size in bits
-	input [n-1:0] in;			//load input
-	input c;						//control line
-	input clr;					//synchronous active-low clear
-	output reg [n-1:0] out; //output
-	
-	always@(posedge clk)
-	begin
-		if(clr == 0)		//clear to 0s
-		begin
-			out <= 0;
-		end
-		else if(c == 1)	//load
-		begin
-			out <= in;
-		end
-		else					//c == 0, so store
-		begin
-			out <= out;
-		end
-	end
-	
+    parameter n;                //register size in bits
+    input [n-1:0] in;           //load input
+    input c;                    //control line
+    input clr;                  //synchronous active-low clear
+    output reg [n-1:0] out;     //output
+    
+    always@(posedge clk)
+    begin
+        if(clr == 0)            //clear to 0s
+        begin
+            out <= 0;
+        end
+        else if(c == 1)         //load
+        begin
+            out <= in;
+        end
+        else                    //c == 0, so store
+        begin
+            out <= out;
+        end
+    end
+    
 endmodule
