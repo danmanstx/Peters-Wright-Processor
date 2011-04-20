@@ -11,15 +11,15 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 module MUX_2x1(in,sel,out);
-	input [1:0]in;	//inputs
-	input sel;		//select line
-	output out;		//output
-	
-	wire [2:0]w;	//wires
-	
-	not(w[0], sel);
-	and(w[1], in[0], w[0]);
-	and(w[2], in[1], sel);
-	or(out, w[2], w[1]);
+    input [1:0]in;  //inputs
+    input sel;      //select line
+    output out;     //output
+    
+    wire [2:0]w;    //wires
+    
+    not(w[0], sel);
+    and(w[1], in[0], w[0]);
+    and(w[2], in[1], sel);
+    or(out, w[2], w[1]);
 
 endmodule

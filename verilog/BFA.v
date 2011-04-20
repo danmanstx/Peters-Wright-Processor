@@ -11,10 +11,10 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 module BFA(a,b,cin,sum,cout);
-	input a,b,cin;
-	output sum,cout;
-	
-	assign cout = (a && b) || (b && cin) || (a && cin);
-	assign sum = a ^ b ^ cin;
+    input a,b,cin;
+    output sum,cout;
+    
+    assign cout = (a && b) || (b && cin) || (a && cin);
+    assign sum = a ^ b ^ cin;
 
 endmodule

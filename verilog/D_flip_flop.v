@@ -11,20 +11,20 @@
 //
 ///////////////////////////////////////////////////////////////////////////////////////
 module D_flip_flop(d_in,clr,set,clk,q);
-	input d_in;		//input
-	input clr;		//synchronous active low clear (priority)
-	input set;		//synchronous active low set
-	input clk;		//clock
-	output reg q;	//output
-	
-	always@(posedge clk)
-	begin
-		if(clr == 1'b0)
-			q <= 0;
-		else if(set == 1'b0)
-			q <= 1;
-		else
-			q <= d_in;
-	end
+    input d_in;     //input
+    input clr;      //synchronous active low clear (priority)
+    input set;      //synchronous active low set
+    input clk;      //clock
+    output reg q;   //output
+    
+    always@(posedge clk)
+    begin
+        if(clr == 1'b0)
+            q <= 0;
+        else if(set == 1'b0)
+            q <= 1;
+        else
+            q <= d_in;
+    end
 endmodule
 
