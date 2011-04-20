@@ -10,7 +10,7 @@
 //A 4x1 priority encoder with enable line.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module encoder(in,enable,out,valid);
+module encoder(in, enable, out, valid);
     input [3:0] in;
     input enable;
     output reg [1:0] out;

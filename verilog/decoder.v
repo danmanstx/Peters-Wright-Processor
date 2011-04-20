@@ -10,11 +10,11 @@
 //A simple parameterized decoder.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module decoder(in,out,enable);
-    paramter n;
-    input [n-1:0] in;
-    output reg [2**n-1:0] out;
-    input enable;
+module decoder(in, out, enable);
+    parameter n = 4;
+    input [n-1:0] in;           //input
+    output reg [2**n-1:0] out;  //output
+    input enable;               //enable
     integer i;
     
     always@(input or enable)

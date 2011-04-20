@@ -19,7 +19,7 @@
 //    11   1    ~B
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module ALU_bitslice(a,b,cin,ctrl,fout,cout);
+module ALU_bitslice(a, b, cin, ctrl, fout, cout);
     input a;            //A input
     input b;            //B input
     input cin;          //carry in (inverts B)

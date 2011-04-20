@@ -10,7 +10,7 @@
 //A 4x1 multiplexer.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module MUX_4x1(in,sel,out);
+module MUX_4x1(in, sel, out);
     input [3:0]in;      //input
     input [1:0]sel;     //select lines
     output out;         //output

@@ -10,7 +10,7 @@
 //A binary full adder.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module BFA(a,b,cin,sum,cout);
+module BFA(a, b, cin, sum, cout);
     input a,b,cin;
     output sum,cout;
     

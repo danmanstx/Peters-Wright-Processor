@@ -11,9 +11,9 @@
 //longer read time that a true RAM would take, a hardware counter is used in the cache.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module RAM(addr,ce,clk,clr,rw,data);
-    parameter d_width;                  //data bus width
-    parameter a_width;                  //address width (2**m memory locations)
+module RAM(addr, ce, clk, clr, rw, data);
+    parameter d_width = 8;              //data bus width
+    parameter a_width = 8;              //address width (2**m memory locations)
     input [a_width-1:0] addr;           //address (m bits wide)
     input ce;                           //chip enable (func. when ce=1, HiZ when ce=0)
     input clk;                          //posedge clock
@@ -38,7 +38,7 @@ module RAM(addr,ce,clk,clr,rw,data);
         end
         if(ce == 1)         //only read or write if chip is enabled
         begin
-            if(clr == 1)
+            if(clr == 1)    //do nothing on a clear
             begin
                 if(rw == 0) //write data
                 begin

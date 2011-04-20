@@ -11,9 +11,9 @@
 //write.  Has a synchronous active low clear.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module register_file(write,reg0addr,reg1addr,writeaddr,data_in,clr,clk,data0,data1);
-    parameter d_width;              //register width
-    parameter a_width;              //address width (2**m) registers
+module register_file(write, reg0addr, reg1addr, writeaddr, data_in, clr, clk, data0, data1);
+    parameter d_width = 8;          //register width
+    parameter a_width = 4;          //address width (2**m) registers
     input write;                    //write data_in to writeaddr when write = 1
     input [a_width-1:0] reg0addr;   //read register 0 address (data to data0)
     input [a_width-1:0] reg1addr;   //read register 1 address (data to data1)

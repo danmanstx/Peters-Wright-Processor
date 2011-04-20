@@ -14,8 +14,8 @@
 //    1    1    load from input
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module ls_reg(in,c,clr,clk,out);
-    parameter n;                //register size in bits
+module ls_reg(in, c, clr, clk, out);
+    parameter n = 4;            //register size in bits
     input [n-1:0] in;           //load input
     input c;                    //control line
     input clr;                  //synchronous active-low clear

@@ -11,7 +11,7 @@
 //least recently utilized replacement algorithm.  The cache contains four entries.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module cache(addr_in,data_in,rw_in,ce_in,addr_out,data_out,rw_out,ce_out,odv,clr,clk);
+module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out, odv, clr, clk);
     //parameters
     parameter d_width = 8;      //data bus width
     parameter a_width = 8;      //address line width
@@ -40,8 +40,11 @@ module cache(addr_in,data_in,rw_in,ce_in,addr_out,data_out,rw_out,ce_out,odv,clr
     reg [1:0] cnt [3:0];            //count (for LRU replacement)
     reg [d_width-1:0] data [3:0];   //entry data
     reg [a_width-1:0] addr [3:0];   //entry addresses
-    reg [2:0] timer;                //timer for 
-    integer i;
+    
+    //other registers
+    reg [2:0] timer;                //timer for a miss
+    integer hit;                        //hit=1 for a hit, hit=0 for a miss
+    integer i;  
     
     always@(posedge clk)
     begin
@@ -49,16 +52,27 @@ module cache(addr_in,data_in,rw_in,ce_in,addr_out,data_out,rw_out,ce_out,odv,clr
         rw_out <= rw_in;
         if(clr == 0)                //clear contents
         begin
-            
+            data_out_reg <= 0;
+            data_in_reg <= 0;
+            timer <= 0;
+            for(i = 0; i < 3; i = i+1)
+            begin
+                valid[i] <= 0;
+                cnt[i] <= 0;
+                data[i] <= 0;
+                addr[i] <= 0;
+            end
         end
         if(ce_in == 1)              //only read or write if chip is enabled
         begin
             if(clr == 1)
             begin
-            
+            hit <= 1;
             end
         end
     end
+
+
 
     genvar j;
 

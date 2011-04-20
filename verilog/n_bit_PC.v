@@ -16,8 +16,8 @@
 //    11   1    load from input
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module n_bit_PC(ld_in,ctrl,clr,clk,out);
-    parameter a_width;              //address width parameter
+module n_bit_PC(ld_in, ctrl, clr, clk, out);
+    parameter a_width = 8;          //address width parameter
     input [a_width-1:0] ld_in;      //load input
     input [1:0] ctrl;               //control lines
     input clr;                      //synchronous active low clear

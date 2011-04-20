@@ -16,8 +16,8 @@
 //    11   1    shift right (rightmost shifts from parallel in LSB)
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module lss_reg(in,c,clr,clk,out);
-    parameter n;            //XXX n >= 2
+module lss_reg(in, c, clr, clk, out);
+    parameter n = 8;        //XXX n >= 2
     input [n-1:0] in;       //parallel load
     input [1:0] c;          //control
     input clr;              //synchronous active low clear

@@ -10,7 +10,7 @@
 //A 2x1 multiplexer.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module MUX_2x1(in,sel,out);
+module MUX_2x1(in, sel, out);
     input [1:0]in;  //inputs
     input sel;      //select line
     output out;     //output

@@ -25,8 +25,8 @@
 //    cout  carry out
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module n_bit_ALU(a,b,cin,ctrl,f,cout,v,z);
-    parameter n;            //data width
+module n_bit_ALU(a, b, cin, ctrl, f, cout, v, z);
+    parameter n = 8;        //data width
     input [n-1:0] a;        //A input
     input [n-1:0] b;        //B input
     input cin;              //carry in (inverts B)
