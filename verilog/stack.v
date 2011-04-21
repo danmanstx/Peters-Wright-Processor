@@ -31,7 +31,7 @@ output reg full;                      // output that is 1 if the stack is full a
 output reg not_empty;                 // output that is 1 when the stack isn't empty and 0 when it is
 reg [depth-1:0]ptr;                   // stack pointer
 reg [width-1:0]data[(2**depth)-1:0];  // this is a register that holds the data
-
+integer i;
 always @(posedge clk)
 begin
     if(clr)
