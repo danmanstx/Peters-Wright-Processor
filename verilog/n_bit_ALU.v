@@ -9,14 +9,22 @@
 //
 //An ALU that implements the following function table:
 //    ctrl cin  funct
-//    00   0    A+B
-//    00   1    A-B
-//    01   0    A|B
-//    01   1    A|~B
-//    10   0    A&B
-//    10   1    A&~B
-//    11   0    ~A
-//    11   1    ~B
+//    000   0    A+B
+//    000   1    A-B
+//    001   0    A|B
+//    001   1    A|~B
+//    010   0    A&B
+//    010   1    A&~B
+//    011   0    ~A
+//    011   1    ~B
+//    100   0    LSL A by B
+//    100   1    LSR A by B
+//    101   0    A|B
+//    101   1    A|~B
+//    110   0    A&B
+//    110   1    A&~B
+//    111   0    A
+//    111   1    B
 //
 //Having the following outputs:
 //    f     result
