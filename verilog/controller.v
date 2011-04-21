@@ -16,11 +16,12 @@
 // Revision 0.01 - File Created
 // Additional Comments: 
 //////////////////////////////////////////////////////////////////////////////////
-module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, s);
+module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s);
     ////////////////////////
     // inputs
     ////////////////////////
     input [5:0]   opcode;
+    input         i_pending;
     input         g_clk;
     input         i_odv;
     input         d_odv;
@@ -58,6 +59,10 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, s);
     reg [5:0] state0;
     reg [5:0] state1;
     reg [5:0] state2;
+    //////////////////////////////////////
+    // for testing only the first stage
+    //////////////////////////////////////
+    parameter ps1r=1;
     //////////////////////////////////////////
     // always block to begin state machine
     //////////////////////////////////////////
@@ -83,7 +88,7 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, s);
             end
             T3:
             begin
-                if(i_dov == 1)  state0 <= T4;
+                if(i_odv == 1)  state0 <= T4;
                 else            state0 <= T3;
 
             end
@@ -340,6 +345,7 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, s);
             default: state0 <= T0;
             endcase
     end
+    /*
     always @(posedge g_clk)
     begin
         case(state1)
@@ -362,4 +368,5 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, s);
         end
         endcase
     end
+    */
 endmodule
