@@ -1,21 +1,15 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company:  University of Kentucky
-// Engineer: Danny Peters and John Wright
-// 
-// Create Date:    20:42:06 04/20/2011 
-// Design Name: 
-// Module Name:    controller 
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
-//////////////////////////////////////////////////////////////////////////////////
+//controller.v
+//
+//                  this is the controller
+//
+///////////////////////////////////////////////////////////////////////////////////////
 module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s);
     ////////////////////////
     // inputs
@@ -29,7 +23,7 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
     ////////////////////////
     // outputs
     ////////////////////////
-    output [27:0] s;
+    output [25:0] s;
     output        g_clr;
     output        hs_out;
     /////////////////////////////
@@ -63,9 +57,10 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
     // for testing only the first stage
     //////////////////////////////////////
     parameter ps1r=1;
-    //////////////////////////////////////////
-    // always block to begin state machine
-    //////////////////////////////////////////
+    assign s=0;
+    ///////////////////////////////////////////////////////
+    // always block to begin state machine for first stage
+    ///////////////////////////////////////////////////////
     always @ (posedge g_clk)
     begin
             case(state0)
@@ -78,19 +73,12 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
                     else               state0 <= T3;
                 end
             end
-            T1:
-            begin
-                state0 <= T2;
-            end
-            T2:
-            begin
-                state0 <= T3;
-            end
+            T1: state0 <= T2;
+            T2: state0 <= T3;
             T3:
             begin
                 if(i_odv == 1)  state0 <= T4;
                 else            state0 <= T3;
-
             end
             T4:
             begin
@@ -144,204 +132,124 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
                     default: state0 <=T51;
                 endcase
             end
-            T5:
-            begin
-                state0 <= T0;
-            end
-            T6:
-            begin
-                state0 <= T52;
-            end
-            T7:
-            begin
-                state0 <= T0;
-            end
-            T8:
-            begin
-                state0 <= T52;
-            end
-            T9:
-            begin
-                state0 <= T0;
-            end
-            T10:
-            begin
-                state0 <=T52;
-            end
-            T11:
-            begin
-                state0 <= T0;
-            end
-            T12:
-            begin
-                state0 <= T52;
-            end
-            T13:
-            begin
-                state0 <= T0;
-            end
-            T14:
-            begin
-                state0 <= T0;
-            end
-            T15:
-            begin
-                state0 <= T0;
-            end
-            T16:
-            begin
-                state0 <= T52;
-            end
-            T17:
-            begin
-                state0 <= T0;
-            end
-            T18:
-            begin
-                state0 <= T52;
-            end
-            T19:
-            begin
-                state0 <= T0;
-            end
-            T20:
-            begin
-                state0 <= T52;
-            end
-            T21:
-            begin
-                state0 <= T0;
-            end
-            T22:
-            begin
-                state0 <= T52;
-            end
-            T23:
-            begin
-                state0 <= T0;
-            end
-            T24:
-            begin
-                state0 <= T52;
-            end
-            T25:
-            begin
-                state0 <= T0;
-            end
-            T26:
-            begin
-                state0 <= T52;
-            end
-            T27:
-            begin
-                state0 <= T0;
-            end
-            T28:
-            begin
-                state0 <= T52;
-            end
-            T29:
-            begin
-                state0 <= T0;
-            end
-            T30:
-            begin
-                state0 <= T52;
-            end
-            T31:
-            begin
-                state0 <= T0;
-            end
-            T32:
-            begin
-                state0 <= T52;
-            end
-            T33:
-            begin
-                state0 <= T0;
-            end
-            T34:
-            begin
-                state0 <= T52;
-            end
-            T35:
-            begin
-                state0 <= T0;
-            end
-            T36:
-            begin
-                state0 <= T0;
-            end
-            T37:
-            begin
-                state0 <= T0;
-            end
-            T38:
-            begin
-                state0 <= T0;
-            end
-            T39:
-            begin
-                state0 <= T0;
-            end
-            T40:
-            begin
-                state0 <= T0;
-            end
-            T41:
-            begin
-                state0 <= T0;
-            end
-            T42:
-            begin
-                state0 <= T0;
-            end
-            T43:
-            begin
-                state0 <= T0;
-            end
-            T44:
-            begin
-                state0 <= T0;
-            end
-            T45:
-            begin
-                state0 <= T52;
-            end
-            T46:
-            begin
-                state0 <= T52;
-            end
-            T47:
-            begin
-                state0 <= T52;
-            end
-            T48:
-            begin
-                state0 <= T0;
-            end
-            T49:
-            begin
-                state0 <= T0;
-            end
-            T50:
-            begin
-                state0 <= T0;
-            end
-            T51:
-            begin
-                state0 <= T0;
-            end
+            T5:  state0 <= T0;
+            T6:  state0 <= T52;
+            T7:  state0 <= T0;
+            T8:  state0 <= T52;
+            T9:  state0 <= T0;
+            T10: state0 <= T52;
+            T11: state0 <= T0;
+            T12: state0 <= T52;
+            T13: state0 <= T0;
+            T14: state0 <= T52;
+            T15: state0 <= T0;
+            T16: state0 <= T52;
+            T17: state0 <= T0;
+            T18: state0 <= T52;
+            T19: state0 <= T0;
+            T20: state0 <= T52;
+            T21: state0 <= T0;
+            T22: state0 <= T52;
+            T23: state0 <= T0;
+            T24: state0 <= T52;
+            T25: state0 <= T0;
+            T26: state0 <= T52;
+            T27: state0 <= T0;
+            T28: state0 <= T52;
+            T29: state0 <= T0;
+            T30: state0 <= T52;
+            T31: state0 <= T0;
+            T32: state0 <= T52;
+            T33: state0 <= T0;
+            T34: state0 <= T52;
+            T35: state0 <= T0;
+            T35: state0 <= T0;
+            T36: state0 <= T0;
+            T37: state0 <= T0;
+            T38: state0 <= T0;
+            T39: state0 <= T0;
+            T40: state0 <= T0;
+            T41: state0 <= T0;
+            T42: state0 <= T0;
+            T43: state0 <= T0;
+            T44: state0 <= T0;
+            T45: state0 <= T52;
+            T46: state0 <= T52;
+            T47: state0 <= T52;
+            T48: state0 <= T0;
+            T49: state0 <= T0;
+            T50: state0 <= T0;
+            T51: state0 <= T0;
             T52:
             begin
                 if(i_odv == 1) state0 <= T53;
                 else           state0 <=T52;
-
             end
-            T53:
-            begin
-                state0 <= T0;
-            end
+            T53: state0 <= T0;
+            default: state0 <= T0;
+            endcase
+    end
+    ///////////////////////////////////////////
+    // always block for first state machine's
+    //  logic
+    ///////////////////////////////////////////
+    always @(state0)
+    begin
+         case(state0)
+            T0: s[0:25] = 25'b0000000000000000000000000;
+            T1: s[0:25] = 25'b00010000001100000000000000;
+            T2: s[0:25] = 25'b00001111000000000000000000;
+            T3: s[0:25] = 25'b11000000000000000000000000;
+            T4: s[0:25] = 25'b10100100000000000000000000;
+            T5: s[0:25] = 25'b;
+            T6: s[0:25] = 25'b;
+            T7: s[0:25] = 25'b;
+            T8: s[0:25] = 25'b;
+            T9: s[0:25] = 25'b;
+            T10: s[0:25] = 25'b;
+            T11: s[0:25] = 25'b;
+            T12: s[0:25] = 25'b;
+            T13: s[0:25] = 25'b;
+            T14: s[0:25] = 25'b;
+            T15: s[0:25] = 25'b;
+            T16: s[0:25] = 25'b;
+            T17: s[0:25] = 25'b;
+            T18: s[0:25] = 25'b;
+            T19: s[0:25] = 25'b;
+            T20: s[0:25] = 25'b;
+            T21: s[0:25] = 25'b;
+            T22: s[0:25] = 25'b;
+            T23: s[0:25] = 25'b;
+            T24: s[0:25] = 25'b;
+            T25: s[0:25] = 25'b;
+            T26: s[0:25] = 25'b;
+            T27: s[0:25] = 25'b;
+            T28: s[0:25] = 25'b;
+            T29: s[0:25] = 25'b;
+            T30: s[0:25] = 25'b;
+            T31: s[0:25] = 25'b;
+            T32: s[0:25] = 25'b;
+            T33: s[0:25] = 25'b;
+            T34: s[0:25] = 25'b;
+            T35: s[0:25] = 25'b;
+            T36: s[0:25] = 25'b;
+            T37: s[0:25] = 25'b;
+            T38: s[0:25] = 25'b;
+            T39: s[0:25] = 25'b;
+            T40: s[0:25] = 25'b;
+            T41: s[0:25] = 25'b;
+            T42: s[0:25] = 25'b;
+            T43: s[0:25] = 25'b;
+            T44: s[0:25] = 25'b;
+            T45: s[0:25] = 25'b;
+            T46: s[0:25] = 25'b;
+            T47: s[0:25] = 25'b;
+            T48: s[0:25] = 25'b;
+            T49: s[0:25] = 25'b;
+            T50: s[0:25] = 25'b;
+            T51: s[0:25] = 25'b;
+            T52: s[0:25] = 25'b11000000000000000000000000;
+            T53: s[0:25] = 25'b10100100000000000000000001;
             default: state0 <= T0;
             endcase
     end
