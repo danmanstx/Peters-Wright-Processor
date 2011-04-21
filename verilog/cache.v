@@ -50,22 +50,35 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
     wire [3:0] dec;                 //dec[i]=1 if decrementing cnt[i]
     integer i;
 
+    //wire wrappers
+    wire [(a_width*4)-1:0] w_addr;
+    wire [7:0] w_cnt;
+    assign w_addr[a_width-1:0] = addr[0];
+    assign w_addr[(a_width*2)-1:a_width] = addr[1];
+    assign w_addr[(a_width*3)-1:(a_width*2)] = addr[2];
+    assign w_addr[(a_width*4)-1:(a_width*3)] = addr[3];
+    assign w_cnt[1:0] = cnt[0];
+    assign w_cnt[3:2] = cnt[1];
+    assign w_cnt[5:4] = cnt[2];
+    assign w_cnt[7:6] = cnt[3];
+    
+    
     //modules
-    determine_hit DETERMINE_HIT (addr_in, addr, cnt, valid, sel, dec, hit);
+    determine_hit DETERMINE_HIT (addr_in, _addr, _cnt, valid, sel, dec, hit);
 
     always@(posedge clk)
     begin
         if(clr == 1'b0)             //clear contents
         begin
-            data_out_reg <= 1'b0;
-            data_in_reg <= 1'b0;
-            timer <= 1'b0;
+            data_out_reg <= 0;
+            data_in_reg <= 0;
+            timer <= 0;
             for(i = 0; i < 3; i = i+1)
             begin
-                valid[i] <= 1'b0;
-                cnt[i] <= 1'b0;
-                data[i] <= 1'b0;
-                addr[i] <= 1'b0;
+                valid[i] <= 0;
+                cnt[i] <= 0;
+                data[i] <= 0;
+                addr[i] <= 0;
             end
         end
         if(ce_in == 1'b1)           //only read or write if chip is enabled

@@ -12,7 +12,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 module determine_hit(addr, w_entry_addrs, w_cnt, valid, sel, dec, hit);
     //parameters
-    parameter d_width = 8;                  //data bus width
     parameter a_width = 8;                  //address line width
     //inputs
     input [a_width-1:0] addr;               //input address
@@ -36,111 +35,127 @@ module determine_hit(addr, w_entry_addrs, w_cnt, valid, sel, dec, hit);
     assign cnt[2] = w_cnt[5:4];
     assign cnt[3] = w_cnt[7:6];
     
-    always@(addr or entry_addrs or valid)
+    always@(addr or w_entry_addrs or valid or w_cnt)
     begin
-        if((addr == entry_addrs[0]) && (valid[0] == 1'b1))
+        if((addr == entry_addrs[0]) && (valid[0] == 1))
         begin
-            //hit on entry 0
-            hit = 1'b1;
-            sel = 2'b00;
-            dec[0] = 1'b0;
-            if(cnt[0] > cnt[1])
-                dec[1] = 1'b0;
+            hit <= 1;
+            sel <= 2'b00;
+            dec[0] <= 0;
+            if(cnt[0] < cnt[1])
+                dec[1] <= 1;
             else
-                dec[1] = 1'b1;
-            if(cnt[0] > cnt[2])
-                dec[2] = 1'b0;
+                dec[1] <= 0;
+            if(cnt[0] < cnt[2])
+                dec[2] <= 1;
             else
-                dec[2] = 1'b1;
-            if(cnt[0] > cnt[3])
-                dec[3] = 1'b0;
+                dec[2] <= 0;
+            if(cnt[0] < cnt[3])
+                dec[3] <= 1;
             else
-                dec[3] = 1'b1;
+                dec[3] <= 0;
         end
-        else if((addr == entry_addrs[1]) && (valid[1] == 1'b1))
+        else if((addr == entry_addrs[1]) && (valid[1] == 1))
         begin
-            //hit on entry 1
-            hit = 1'b1;
-            sel = 2'b01;
-            dec[1] = 1'b0;
-            if(cnt[1] > cnt[0])
-                dec[0] = 1'b0;
+            hit <= 1;
+            sel <= 2'b01;
+            dec[1] <= 0;
+            if(cnt[1] < cnt[0])
+                dec[0] <= 1;
             else
-                dec[0] = 1'b1;
-            if(cnt[1] > cnt[2])
-                dec[2] = 1'b0;
+                dec[0] <= 0;
+            if(cnt[1] < cnt[2])
+                dec[2] <= 1;
             else
-                dec[2] = 1'b1;
-            if(cnt[1] > cnt[3])
-                dec[3] = 1'b0;
+                dec[2] <= 0;
+            if(cnt[1] < cnt[3])
+                dec[3] <= 1;
             else
-                dec[3] = 1'b1;
+                dec[3] <= 0;
         end
-        else if((addr == entry_addrs[2]) && (valid[2] == 1'b1))
+        else if((addr == entry_addrs[2]) && (valid[2] == 1))
         begin
-            //hit on entry 2
-            hit = 1'b1;
-            sel = 2'b10;
-            dec[2] = 1'b0;
-            if(cnt[2] > cnt[0])
-                dec[0] = 1'b0;
+            hit <= 1;
+            sel <= 2'b10;
+            dec[2] <= 0;
+            if(cnt[2] < cnt[0])
+                dec[0] <= 1;
             else
-                dec[0] = 1'b1;
-            if(cnt[2] > cnt[1])
-                dec[1] = 1'b0;
+                dec[0] <= 0;
+            if(cnt[2] < cnt[1])
+                dec[1] <= 1;
             else
-                dec[1] = 1'b1;
-            if(cnt[2] > cnt[3])
-                dec[3] = 1'b0;
+                dec[1] <= 0;
+            if(cnt[2] < cnt[3])
+                dec[3] <= 1;
             else
-                dec[3] = 1'b1;
+                dec[3] <= 0;
         end
-        else if((addr == entry_addrs[3]) && (valid[3] == 1'b1))
+        else if((addr == entry_addrs[3]) && (valid[3] == 1))
         begin
-            //hit on entry 3
-            hit = 1'b1;
-            sel = 2'b11;
-            dec[3] = 1'b0;
-            if(cnt[3] > cnt[0])
-                dec[0] = 1'b0;
+            hit <= 1;
+            sel <= 2'b11;
+            dec[3] <= 0;
+            if(cnt[3] < cnt[0])
+                dec[0] <= 1;
             else
-                dec[0] = 1'b1;
-            if(cnt[3] > cnt[1])
-                dec[1] = 1'b0;
+                dec[0] <= 0;
+            if(cnt[3] < cnt[1])
+                dec[1] <= 1;
             else
-                dec[1] = 1'b1;
-            if(cnt[3] > cnt[2])
-                dec[2] = 1'b0;
+                dec[1] <= 0;
+            if(cnt[3] < cnt[2])
+                dec[2] <= 1;
             else
-                dec[2] = 1'b1;
+                dec[2] <= 0;
+        end
+        else if(valid[0] == 1'b0)
+        begin
+            hit <= 0;
+            dec <= 4'b1110;
+            sel <= 2'b00;
+        end
+        else if(valid[1] == 1'b0)
+        begin
+            hit <= 0;
+            dec <= 4'b1101;
+            sel <= 2'b01;
+        end
+        else if(valid[2] == 21'b0)
+        begin
+            hit <= 0;
+            dec <= 4'b1011;
+            sel <= 2'b10;
+        end
+        else if(valid[3] == 1'b0)
+        begin
+            hit <= 0;
+            dec <= 4'b0111;
+            sel <= 2'b11;
+        end
+        else if(cnt[0] == 2'b00)
+        begin
+            hit <= 0;
+            dec <= 4'b1110;
+            sel <= 2'b00;
+        end
+        else if(cnt[1] == 2'b00)
+        begin
+            hit <= 0;
+            dec <= 4'b1101;
+            sel <= 2'b01;
+        end
+        else if(cnt[2] == 2'b00)
+        begin
+            hit <= 0;
+            dec <= 4'b1011;
+            sel <= 2'b10;
         end
         else
         begin
-            //miss
-            if((cnt[0] == 2'b00) || (valid[0] == 1'b0))
-            begin
-                hit = 1'b0;
-                sel = 2'b00;
-                dec = 4'b0111;
-            end
-            else if((cnt[1] == 2'b00) || (valid[1] == 1'b0))
-            begin
-                hit = 1'b0;
-                sel = 2'b01;
-                dec = 4'b1011;
-            end
-            else if((cnt[2] == 2'b00) || (valid[2] == 1'b0))
-            begin
-                hit = 1'b0;
-                sel = 2'b10;
-                dec = 4'b1101;
-            end
-            else    //replace 3
-            begin
-                hit = 1'b0;
-                sel = 2'b11;
-                dec = 4'b1110;
-            end
+            hit <= 0;
+            dec <= 4'b0111;
+            sel <= 2'b11;
         end
     end
 
