@@ -19,20 +19,20 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
-	// inputs
+    // inputs
     input [7:0]  bus_in;      // this is an input that is called bus_in
-	input        hsk_in;       // this is an input used for handshaking
-	input        g_clk;       // this is the clock input
-	input [3:0]  ext_int;     // this is an external interrupt input
-	// outputs
-	output [7:0] bus_out;        // this is an output called bus_out
-	output       hsk_out;       // this is another input used for handshaking
+    input        hsk_in;       // this is an input used for handshaking
+    input        g_clk;       // this is the clock input
+    input [3:0]  ext_int;     // this is an external interrupt input
+    // outputs
+    output [7:0] bus_out;        // this is an output called bus_out
+    output       hsk_out;       // this is another input used for handshaking
     //wires
     wire [55:0]s;
-	///////////////////
-	// stage one	  //
-	///////////////////
-	//wires
+    ///////////////////
+    // stage one     //
+    ///////////////////
+    //wires
     wire [25:0] iram_in;
     wire [23:0] icache_in;
     wire [15:0] ir_out;
@@ -40,23 +40,23 @@ module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
     wire [7:0]  pc_in;
     wire        i_pending;
     wire [7:0]  pc_out;
-    wire [7:0]  psr0_in;
+    wire [32:0] psr0_in;
     wire [3:0]  mask_in;
-    wire [23:0] psr0_out;
+    wire [32:0] psr0_out;
     wire        ien_out;
     wire [7:0]  ipcr_out;
     wire [7:0]  peek_out;
     // functional units
-	RAM #(.d_width(16),.a_width(8))     I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
-	cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
-	ls_reg #(.n(16))                    IR (icache_in[23:8], s[2], g_clr, g_clk, ir_out[15:0]);                                         // 16 bit instruction register
-	sign_extend                         SEX (ir_out[5:0], sex_out[7:0]);                                                                // sign extend from IR to mux
-	n_bit_PC #(.a_width(8))             PC (pc_in[7:0], {s[5],s[4]}, g_clr, g_clk, icache_in[7:0]);                                     //  8 bit program counter
-	MUX_mxn #(.d_width(8),.s_lines(2))  PC_MUX ({psr1_out[22:15],peek_out[7:0],ipcr_out[7:0],pc_out[7:0]}, {s[7],s[6]}, pc_in[7:0]);    // 4x8 mux for program counter
-	MUX_mxn #(.d_width(8),.s_lines(2))  PSR0_MUX ({ir_out[15:7],ir_out[9:2],sex_out[7:0],8'h00}, {s[13],s[12]}, psr0_in[7:0]);            // 4x8 mux for pipelined stage register instruction
-	ls_reg #(.n(8))                     IPCR (icache_in[7:0], s[3], g_clr, g_clk, ipcr_out[7:0]);                                       // 8 bit interrupt program counter  register
-	stack                               RETURN_STACK (peek_out[7:0], icache_in[7:0], s[3], s[9], g_clk, g_clr, full, not_empty );       // return stack
- 	ls_reg #(.n(35))                    PSR0 ({ir_out[9:6],ir_out[5:2],psr0_in[7:0],icache_in[7:0],s[23:20],s[18:15],s[19]}, s[8], g_clr, g_clk, psr0_out[34:0]); // pipeline stage register zero
+    RAM #(.d_width(16),.a_width(8))     I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
+    cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
+    ls_reg #(.n(16))                    IR (icache_in[23:8], s[2], g_clr, g_clk, ir_out[15:0]);                                         // 16 bit instruction register
+    sign_extend                         SEX (ir_out[5:0], sex_out[7:0]);                                                                // sign extend from IR to mux
+    n_bit_PC #(.a_width(8))             PC (pc_in[7:0], {s[5],s[4]}, g_clr, g_clk, icache_in[7:0]);                                     //  8 bit program counter
+    MUX_mxn #(.d_width(8),.s_lines(2))  PC_MUX ({psr1_out[22:15],peek_out[7:0],ipcr_out[7:0],pc_out[7:0]}, {s[7],s[6]}, pc_in[7:0]);    // 4x8 mux for program counter
+    MUX_mxn #(.d_width(8),.s_lines(2))  PSR0_MUX ({ir_out[15:7],ir_out[9:2],sex_out[7:0],8'h00}, {s[13],s[12]}, psr0_in[7:0]);          // 4x8 mux for pipelined stage register instruction
+    ls_reg #(.n(8))                     IPCR (icache_in[7:0], s[3], g_clr, g_clk, ipcr_out[7:0]);                                       // 8 bit interrupt program counter  register
+    stack                               RETURN_STACK (peek_out[7:0], icache_in[7:0], s[3], s[9], g_clk, g_clr, full, not_empty );       // return stack
+    ls_reg #(.n(35))                    PSR0 ({ir_out[9:6],ir_out[5:2],psr0_in[7:0],icache_in[7:0],s[23:20],s[18:15],s[19]}, s[8], g_clr, g_clk, psr0_out[32:0]); // pipeline stage register zero
     ls_reg #(.n(1))                     I_EN(s[11],s[10], g_clr, g_clk, ien_out);
     ///////////////////
     // stage two     //
