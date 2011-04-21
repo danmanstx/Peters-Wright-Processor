@@ -36,10 +36,13 @@ always @(posedge clk)
 begin
     if(clr)
     begin
-        data <= 0;
+        for(i=0;i<(2**depth)-1;i=i+1)
+        begin
+            data <= 0;
+        end
         ptr <= 0;
         full <= 0;
-        non_empty <= 0;
+        not_empty <= 0;
     end
     else
     begin
