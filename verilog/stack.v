@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module stack(peek, push, c, en, clk, clr,  full, empty);
+module stack(peek, push, c, en, clk, clr,  full, not_empty);
 parameter width = 8;
 parameter depth = 1;
 input c;                              // this is the control line
