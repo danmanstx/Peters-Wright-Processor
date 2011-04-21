@@ -26,12 +26,14 @@ input en;                             // this is the enable
 input clk;                            // this is a clocked input
 input clr;                            // this is for the global clear
 input [width-1:0]push;                // get the value in to push
-output [width-1:0]peek;               // the value that would be popped
+output reg [width-1:0] peek;          // the value that would be popped
 output reg full;                      // output that is 1 if the stack is full and 0 otherwise
 output reg not_empty;                 // output that is 1 when the stack isn't empty and 0 when it is
 reg [depth-1:0]ptr;                   // stack pointer
 reg [width-1:0]data[(2**depth)-1:0];  // this is a register that holds the data
+
 integer i;
+
 always @(posedge clk)
 begin
     if(clr)
@@ -47,7 +49,12 @@ begin
     else
     begin
         if(en == 0)
-            peek <= data[ptr];
+        begin
+            if(not_empty == 1)
+                peek <= data[ptr];
+            else
+                peek <= push;
+        end
         else
         begin
             if(c == 0)  //pop
@@ -58,6 +65,12 @@ begin
                     peek <= data[ptr-1];
                     if(ptr-1 == 0)
                         not_empty <= 0;
+                    else
+                        not_empty <= 1;
+                end
+                else
+                begin
+                
                 end
             else       // c=1, push
                 if(full == 0)
@@ -67,6 +80,8 @@ begin
                     data[ptr+1] <= push;
                     if(ptr == (2**depth)-2)
                         full <= 1;
+                    else
+                        full <= 0;
                 end
         end
     end
