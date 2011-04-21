@@ -21,16 +21,16 @@
 module stack(peek, push, c, en, clk, clr,  full, not_empty);
 parameter width = 8;
 parameter depth = 1;
-input c;                              // this is the control line
-input en;                             // this is the enable
-input clk;                            // this is a clocked input
-input clr;                            // this is for the global clear
-input [width-1:0]push;                // get the value in to push
-output [width-1:0]peek;               // the value that would be popped
-output reg full;                      // output that is 1 if the stack is full and 0 otherwise
-output reg not_empty;                 // output that is 1 when the stack isn't empty and 0 when it is
-reg [depth-1:0]ptr;                   // stack pointer
-reg [width-1:0]data[(2**depth)-1:0];  // this is a register that holds the data
+input                     c;               // this is the control line
+input                    en;               // this is the enable
+input                   clk;               // this is a clocked input
+input                   clr;               // this is for the global clear
+input      [width-1:0] push;               // get the value in to push
+output reg [width-1:0] peek;               // the value that would be popped
+output reg             full;               // output that is 1 if the stack is full and 0 otherwise
+output reg        not_empty;               // output that is 1 when the stack isn't empty and 0 when it is
+reg        [depth-1:0]  ptr;               // stack pointer
+reg        [width-1:0] data [(2**depth)-1:0];   // this is a register that holds the data
 integer i;
 always @(posedge clk)
 begin
