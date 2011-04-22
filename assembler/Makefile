@@ -8,6 +8,11 @@ OBJS = assembler.tab.o lex.yy.o main.o
 CC = g++
 CFLAGS = -g -Wno-write-strings -Wno-deprecated -ansi -pedantic
 
+all: assembler rom_builder
+
+rom_builder: RomBuilder.java
+	javac RomBuilder.java
+
 assembler: $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o assembler -lfl
 	
@@ -29,5 +34,5 @@ main.o: main.cc
 lex.yy.o main.o: assembler.tab.h
 
 clean:
-	rm -f *.o *~ lex.yy.c assembler.tab.c assembler.tab.h assembler.output assembler testprogs/*~
-	
+	rm -f *.o *.class *.v *.bin *.txt *~ lex.yy.c assembler.tab.c assembler.tab.h assembler.output assembler testprogs/*~
+

@@ -7,9 +7,9 @@
 //
 //Usage:
 //
-//     assembler [-[d][v]] [outputfile] inputfile
+//     assembler [-d|v|dv|m] [outputfile] inputfile
 
-#define USAGE "assembler [-[d][v]] [outputfile] inputfile"
+#define USAGE "assembler [-d|v|dv|m] [outputfile] inputfile"
 
 using namespace std;
 
@@ -18,6 +18,7 @@ using namespace std;
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <unistd.h>
 #include "assembler.tab.h"
 
 extern int yyparse();
@@ -26,12 +27,15 @@ FILE* outfile;
 FILE* debugfile;
 bool flag_debug;
 bool flag_verbose;
+bool flag_module;
+char execstr[64];
 
 int main(int argc, char** argv) {
     
     flag_debug = false;
     flag_verbose = false;
-    
+    flag_module = false;
+
     if(argc == 2) {
         //no options
         yyin = fopen(argv[1],"r");
@@ -60,6 +64,16 @@ int main(int argc, char** argv) {
             yyin = fopen(argv[2],"r");
             outfile = fopen("out.bin","w");
             
+        } else if(strcmp(argv[1],"-m") == 0) {
+            //enable debug output
+            flag_debug = true;
+            //create verilog module
+            flag_module = true;
+            debugfile = fopen("out_debug.txt","w");
+            strcpy(execstr,"java RomBuilder out.bin");
+            yyin = fopen(argv[2],"r");
+            outfile = fopen("out.bin","w");
+        
         } else {
             //output to specific file
             yyin = fopen(argv[2],"r");
@@ -90,6 +104,17 @@ int main(int argc, char** argv) {
             yyin = fopen(argv[3],"r");
             outfile = fopen(argv[2],"w");
             
+        } else if(strcmp(argv[1],"-m") == 0) {
+            //enable debug output
+            flag_debug = true;
+            //create verilog module
+            flag_module = true;
+            strcpy(execstr,"java RomBuilder ");
+            strcat(execstr,argv[2]);
+            debugfile = fopen("out_debug.txt","w");
+            yyin = fopen(argv[3],"r");
+            outfile = fopen(argv[2],"w");
+        
         } else {
             //usage error
             cout << "Usage:" << endl;
@@ -110,5 +135,7 @@ int main(int argc, char** argv) {
     fclose(outfile);
     if(flag_debug)
         fclose(debugfile);
+    if(flag_module)
+        system(execstr);
     
 }
