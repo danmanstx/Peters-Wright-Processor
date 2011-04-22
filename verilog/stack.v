@@ -47,7 +47,12 @@ begin
     else
     begin
         if(en == 0)
-            peek <= data[ptr];
+        begin
+            if(not_empty == 1)
+                peek <= data[ptr];
+            else
+                peek <= push;
+        end
         else
         begin
             if(c == 0)  //pop
@@ -58,6 +63,12 @@ begin
                     peek <= data[ptr-1];
                     if(ptr-1 == 0)
                         not_empty <= 0;
+                    else
+                        not_empty <= 1;
+                end
+                else
+                begin
+                
                 end
             else       // c=1, push
                 if(full == 0)
@@ -67,6 +78,8 @@ begin
                     data[ptr+1] <= push;
                     if(ptr == (2**depth)-2)
                         full <= 1;
+                    else
+                        full <= 0;
                 end
         end
     end

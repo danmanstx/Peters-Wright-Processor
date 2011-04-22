@@ -487,8 +487,8 @@ instruction:        AND alu_opr {
                         $$ = OP_STR + $2 + "000000\n" + $5 + "00000000\n";
                     } |
                     
-                    LMR num_4 {
-                        $$ = OP_LMR + $2 + "000000\n";
+                    LMR '#' num_4 {
+                        $$ = OP_LMR + $3 + "000000\n";
                     } |
                     
                     IN num_4 {

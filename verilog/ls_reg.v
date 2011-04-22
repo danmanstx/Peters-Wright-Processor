@@ -19,7 +19,7 @@ module ls_reg(in, c, clr, clk, out);
     input [n-1:0] in;           //load input
     input c;                    //control line
     input clr;                  //synchronous active-low clear
-    input clk;                  // clock
+    input clk;                  //clock
     output reg [n-1:0] out;     //output
     
     always@(posedge clk)
