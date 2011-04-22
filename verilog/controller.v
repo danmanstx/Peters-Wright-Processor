@@ -53,6 +53,9 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
     reg [5:0] state0;
     reg [5:0] state1;
     reg [5:0] state2;
+    reg ps0r;
+    reg ps1r;
+    reg d_rdy;
     //////////////////////////////////////
     // for testing only the first stage
     //////////////////////////////////////
