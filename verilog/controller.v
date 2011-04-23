@@ -10,21 +10,24 @@
 //                  this is the controller
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s);
+module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s, st1, st2, pc_w);
     ////////////////////////
     // inputs
     ////////////////////////
     input [5:0]   opcode;
     input         i_pending;
     input         g_clk;
+    input         g_clr;
+    input         pc_w;
     input         i_odv;
     input         d_odv;
     input         hs_in;
-    ////////////////////////
+    input [4:0]   st1;
+    input [1:0]   st2;
+    /////////////////////////
     // outputs
     ////////////////////////
     output [50:0] s;
-    output        g_clr;
     output        hs_out;
     /////////////////////////////
     // parameters for each state
@@ -404,7 +407,7 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
         case(state2)
         T0:
             if(ps1r == 1)
-                case(ST1)
+                case(ST2)
                     0:  state2 <= T1;
                     1:  state2 <= T2;
                     2:  state2 <= T3;
