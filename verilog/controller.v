@@ -439,33 +439,33 @@ module controller(opcode, g_clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s,
     ////////////////////////////////
     // always block to set ps0r
     ////////////////////////////////
-    always @ (state1)
+    always @ (state0)
     begin
-        if(state1 == 0)     ps0r = 1;
+        if(state0 == 0)     ps0r = 1;
         else                ps0r = 0;
     end
     /////////////////////////////////
     // always block to set ps1r
     ////////////////////////////////
-    always @ (state2)
+    always @ (state1)
     begin
-        if(state2 == 0) ps1r = 1;
+        if(state1 == 0) ps1r = 1;
         else            ps1r = 0;
     end
     /////////////////////////////////
     // always block to set ps2r
     ////////////////////////////////
-    always @ (state3)
+    always @ (state2)
     begin
-        if(state3 == 0) ps2r = 1;
+        if(state2 == 0) ps2r = 1;
         else            ps2r = 0;
     end
     /////////////////////////////////
     // always block to set d_rdy
     ////////////////////////////////
-    always @(state3)
+    always @(state2)
     begin
-        case(state3)
+        case(state2)
             0:d_rdy=1;
             1:d_rdy=1;
             2:d_rdy=0;

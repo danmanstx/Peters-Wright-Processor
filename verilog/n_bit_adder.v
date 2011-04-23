@@ -15,7 +15,6 @@ module n_bit_adder(a,b,s);
     input [n-1:0] a;
     input [n-1:0] b;
     output [n-1:0] s;
-    output cout;
     wire [n:0] c;
 
 
