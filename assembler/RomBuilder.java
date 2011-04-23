@@ -17,12 +17,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class RomBuilder {
 
     public static final String USAGE = 
-        "Usage:\n    java RomBuilder infile [d_width a_width]";
+        "Usage:\n    java RomBuilder [-w d_width a_width] infile0 [infile1 ...]";
 
     public static final String FILEHEAD =
         "`timescale 1ns / 1ps\n" +
@@ -90,26 +91,27 @@ public class RomBuilder {
         "\n" +
         "endmodule";
 
-    private static String filename;
     private static int d_width;
     private static int a_width;
     private static int memlocs;
     private static StringTokenizer tokenizer;
-    private static FileReader reader;
     private static FileWriter writer;
-    private static File inFile;
+    private static ArrayList<File> inFiles;
     private static File outFile;
-
     private static int[][] data;
 
     public static void main(String [] args) {
-        if( args.length == 1 ) {
-            filename = args[0];
-            d_width = 16;   //default to 16
-            a_width = 8;    //default to 8
+
+        inFiles = new ArrayList<File>();
+        if( args.length == 0 ) {
+            System.err.println( USAGE );
+            System.exit(1);
         }
-        else if( args.length == 3 ) {
-            filename = args[0];
+        if( args[0].equals("-w") ) {
+            if( args.length < 4 ) {
+                System.err.println( USAGE );
+                System.exit(1);
+            }
             try {
                 d_width = Integer.parseInt(args[1]);
                 a_width = Integer.parseInt(args[2]);
@@ -118,35 +120,30 @@ public class RomBuilder {
                 System.err.println( USAGE );
                 System.exit(1);
             }
+            //get other files
+            for( int i = 3; i < args.length; i += 1 )
+                inFiles.add( new File( args[i] ) );
         }
         else {
-            System.err.println( USAGE );
-            System.exit(1);
+            d_width = 16;   //default to 16
+            a_width = 8;    //default to 8
+            for( int i = 0; i < args.length; i += 1 )
+                inFiles.add( new File( args[i] ) );
         }
 
         memlocs = 1;
-        for( int i = 0; i < a_width; i += 1 ) {
+        for( int i = 0; i < a_width; i += 1 )
             memlocs *= 2;
-        }
 
         data = new int[memlocs][d_width];
 
-        tokenizer = new StringTokenizer( filename );
+        tokenizer = new StringTokenizer( inFiles.get(0).getName() );
 
         try {
-            inFile = new File( filename );
             outFile = new File( "RAM_" + tokenizer.nextToken(".") + ".v" );
-
-            reader = new FileReader( inFile );
             writer = new FileWriter( outFile );
-        }
-        catch( IOException e ) {
-            System.err.println( "IO Error." );
-            System.exit(1);
-        }
-
-        try {
-            scanInFile();
+            for( File f : inFiles )
+                scanInFile(f);
         }
         catch( IOException e ) {
             System.err.println( e.getMessage() );
@@ -172,7 +169,6 @@ public class RomBuilder {
 
             writer.write( FILEEND );
 
-            reader.close();
             writer.close();
 
         }
@@ -182,13 +178,30 @@ public class RomBuilder {
 
     }
 
-    public static void scanInFile() throws IOException {
+    public static void scanInFile(File file) throws IOException {
+        FileReader reader = new FileReader(file);
         int a = 0;
         int d = 0;
         try {
             while( reader.ready() ) {
                 char c = (char)reader.read();
-                if(c == '0') {
+                if( c == '@' ) {
+                    int i = 0;
+                    if( d != 0 )
+                        throw new IOException( "Error at symbol @ on line: " + a );
+                    if( !reader.ready() )
+                        throw new IOException( "Unexpected EOF" );
+                    c = (char)reader.read();
+                    while( c != '\n' ) {
+                        if( !reader.ready() )
+                            throw new IOException( "Unexpected EOF" );
+                        if( !Character.isDigit(c) )
+                            throw new IOException( "Unexpected character: " + c + " on line: " + a );
+                        i = 10*i + Character.digit( c, 10 );
+                        c = (char)reader.read();
+                    }
+                    a = i;
+                } else if(c == '0') {
                     data[a][d++] = 0;
                 } else if(c == '1') {
                     data[a][d++] = 1;
@@ -201,7 +214,9 @@ public class RomBuilder {
             }
         }
         catch( NullPointerException e ) {
+            reader.close();
             throw new IOException( "Error in input file.  Too many characters on line: " + a );
         }
+        reader.close();
     }
 }

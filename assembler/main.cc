@@ -7,9 +7,9 @@
 //
 //Usage:
 //
-//     assembler [-d|v|dv|m] [outputfile] inputfile
+//     assembler [-d|v|dv|m|mi] [outputfile] inputfile
 
-#define USAGE "assembler [-d|v|dv|m] [outputfile] inputfile"
+#define USAGE "assembler [-d|v|dv|m|mi] [outputfile] inputfile"
 
 using namespace std;
 
@@ -18,7 +18,6 @@ using namespace std;
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <unistd.h>
 #include "assembler.tab.h"
 
 extern int yyparse();
@@ -74,6 +73,17 @@ int main(int argc, char** argv) {
             yyin = fopen(argv[2],"r");
             outfile = fopen("out.bin","w");
         
+        } else if(strcmp(argv[1],"-mi") == 0) {
+            //enable debug output
+            flag_debug = true;
+            //create verilog module
+            flag_module = true;
+            debugfile = fopen("out_debug.txt","w");
+            strcpy(execstr,"java RomBuilder out.bin isrcode/isr0 isrcode/isr1 isrcode/isr2 isrcode/isr3");
+            //include isrs
+            yyin = fopen(argv[2],"r");
+            outfile = fopen("out.bin","w");
+        
         } else {
             //output to specific file
             yyin = fopen(argv[2],"r");
@@ -111,6 +121,19 @@ int main(int argc, char** argv) {
             flag_module = true;
             strcpy(execstr,"java RomBuilder ");
             strcat(execstr,argv[2]);
+            debugfile = fopen("out_debug.txt","w");
+            yyin = fopen(argv[3],"r");
+            outfile = fopen(argv[2],"w");
+        
+        } else if(strcmp(argv[1],"-m") == 0) {
+            //enable debug output
+            flag_debug = true;
+            //create verilog module
+            flag_module = true;
+            strcpy(execstr,"java RomBuilder ");
+            strcat(execstr,argv[2]);
+            //include isrs
+            strcat(execstr," isrcode/isr0 isrcode/isr1 isrcode/isr2 isrcode/isr3");
             debugfile = fopen("out_debug.txt","w");
             yyin = fopen(argv[3],"r");
             outfile = fopen(argv[2],"w");
