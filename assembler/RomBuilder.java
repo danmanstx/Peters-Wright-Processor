@@ -50,7 +50,6 @@ public class RomBuilder {
         "    reg [d_width-1:0] data_out_reg;     //data output register\n" +
         "    reg [d_width-1:0] memory [2**a_width-1:0];  //memory values\n" +
         "    wire bufctrl;                               //buffer control\n" +
-        "    integer i;\n" +
         "    \n" +
         "    //read/write synchronous loop\n" +
         "    always@(posedge clk)\n" +
@@ -79,21 +78,22 @@ public class RomBuilder {
         "    \n" +
         "    genvar j;\n" +
         "    \n" +
-        "    assign bufctrl = (rw && ce) +    //buffer only when rw=1 and ce=1 (read and chip enabled)\n" +
+        "    assign bufctrl = (rw && ce);    //buffer only when rw=1 and ce=1 (read and chip enabled)\n" +
         "    \n" +
         "    //data direction buffers for inout\n" +
         "    generate\n" +
-        "    for(j = 0 + j < d_width; j = j+1)\n" +
+        "    for(j = 0; j < d_width; j = j+1)\n" +
         "    begin:buffers\n" +
         "        bufif1 RW_BUF    (data[j],data_out_reg[j],bufctrl);\n" +
         "    end\n" +
         "    endgenerate\n" +
         "\n" +
-        "endmodule";
+        "endmodule\n";
 
     private static int d_width;
     private static int a_width;
     private static int memlocs;
+    private static String moduleName;
     private static StringTokenizer tokenizer;
     private static FileWriter writer;
     private static ArrayList<File> inFiles;
@@ -138,9 +138,10 @@ public class RomBuilder {
         data = new int[memlocs][d_width];
 
         tokenizer = new StringTokenizer( inFiles.get(0).getName() );
+        moduleName = "RAM_" + tokenizer.nextToken(".");
 
         try {
-            outFile = new File( "RAM_" + tokenizer.nextToken(".") + ".v" );
+            outFile = new File( moduleName + ".v" );
             writer = new FileWriter( outFile );
             for( File f : inFiles )
                 scanInFile(f);
@@ -154,8 +155,11 @@ public class RomBuilder {
 
             writer.write( FILEHEAD );
 
-            writer.write( "    parameter d_width = " + d_width + ";              //data bus width\n" +
-                "    parameter a_width = " + a_width + ";              //address width (2**m memory locations)\n" );
+            writer.write(
+                "module " + moduleName + "(addr, ce, clk, clr, rw, data);\n" +
+                "    parameter d_width = " + d_width + ";              //data bus width\n" +
+                "    parameter a_width = " + a_width + ";              //address width (2**m memory locations)\n"
+                );
 
             writer.write( FILEMID );
 
