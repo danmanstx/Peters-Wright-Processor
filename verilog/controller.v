@@ -10,13 +10,13 @@
 //                  this is the controller
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s, st1, st2, pc_w);
+module controller(opcode, g_clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s, st1, st2, pc_w);
     ////////////////////////
     // inputs
     ////////////////////////
     input [5:0]   opcode;
     input         i_pending;
-    input         g_clk;
+    input         clk;
     input         g_clr;
     input         pc_w;
     input         i_odv;
@@ -58,13 +58,14 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
     reg [5:0] state2;
     reg ps0r;
     reg ps1r;
+    reg ps2r;
     reg d_rdy;
 
     assign s=0;
     ///////////////////////////////////////////////////////
     // always block to begin state machine for first stage
     ///////////////////////////////////////////////////////
-    always @ (posedge g_clk)
+    always @ (posedge clk)
     begin
             case(state0)
             T0:
@@ -264,7 +265,7 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
     //////////////////////////
     // state machine 2
     /////////////////////////
-    always @(posedge g_clk)
+    always @(posedge clk)
     begin
         case(state1)
         T0:
@@ -272,7 +273,7 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
             if(ps0r == 0) state1 <= T0;
             else
             begin
-                case(ST1)
+                case(st1)
                 0:  state1 <= T1;
                 1:  state1 <= T3;
                 2:  state1 <= T5;
@@ -402,12 +403,12 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
     // third stage state
     // machine
     ////////////////////////
-    always @ (posedge g_clk)
+    always @ (posedge clk)
     begin
         case(state2)
         T0:
             if(ps1r == 1)
-                case(ST2)
+                case(st2)
                     0:  state2 <= T1;
                     1:  state2 <= T2;
                     2:  state2 <= T3;
@@ -435,5 +436,43 @@ module controller(opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, 
             default: s[45:50] = 6'b000000;
         endcase
     end
+    ////////////////////////////////
+    // always block to set ps0r
+    ////////////////////////////////
+    always @ (state1)
+    begin
+        if(state1 == 0)     ps0r = 1;
+        else                ps0r = 0;
+    end
+    /////////////////////////////////
+    // always block to set ps1r
+    ////////////////////////////////
+    always @ (state2)
+    begin
+        if(state2 == 0) ps1r = 1;
+        else            ps1r = 0;
+    end
+    /////////////////////////////////
+    // always block to set ps2r
+    ////////////////////////////////
+    always @ (state3)
+    begin
+        if(state3 == 0) ps2r = 1;
+        else            ps2r = 0;
+    end
+    /////////////////////////////////
+    // always block to set d_rdy
+    ////////////////////////////////
+    always @(state3)
+    begin
+        case(state3)
+            0:d_rdy=1;
+            1:d_rdy=1;
+            2:d_rdy=0;
+            3:d_rdy=1;
+            default:d_rdy=1;
+        endcase
+    end
 
 endmodule
+
