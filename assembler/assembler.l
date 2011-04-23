@@ -24,11 +24,11 @@ string line_toprint = "";           //line data returned to parser
 %}
 
 b       [01]
-d		[0-9]
+d       [0-9]
 bin     "%"{b}+
-dec		(-)?{d}+
+dec     (-)?{d}+
 hex     "$"[0-9a-fA-F]+
-lbl		[a-zA-Z][_a-zA-Z0-9]*
+lbl     [a-zA-Z][_a-zA-Z0-9]*
 
 I_LINE_COMMENT "\""([^\n])*
 
@@ -61,13 +61,13 @@ I_LINE_COMMENT "\""([^\n])*
 {dec}               {line += yytext; return DEC; }
 {hex}               {line += yytext; return HEX; }
 "-"                 {line += yytext; return '-'; }
-"#"			        {line += yytext; return '#'; }
-"("	    	        {line += yytext; return '('; }
+"#"                 {line += yytext; return '#'; }
+"("                 {line += yytext; return '('; }
 ")"                 {line += yytext; return ')'; }
 ","                 {line += yytext; return ','; }
 ":"                 {line += yytext; return ':'; }
-[ \t]*		        {line += yytext; }
-[\n]		        {
+[ \t]*              {line += yytext; }
+[\n]                {
                         line_toprint = line;
                         line = "";
                         yylineno += 1;

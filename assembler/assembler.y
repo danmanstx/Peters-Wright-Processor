@@ -508,7 +508,7 @@ instruction:        AND alu_opr {
                         //label declaration
                         label_create(yytext,addr);
                         flag_label = true;
-                    } ':';
+                    } ':' ;
                     
 alu_opr:            num_4 ',' num_4 {
                         //direct addressing mode
