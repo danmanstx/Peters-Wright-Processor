@@ -96,7 +96,7 @@ module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
     MUX_mxn #(.d_width(8),.s_lines(2))     BRANCH_MUX({psr0_out[15:8],rdata0[7:0],branch_adder_out[7:0],rdata1[7:0]}, {s[34],s[33]}, branch_mux_out[7:0]);
     ls_reg #(.n(8))                        RBRA (branch_mux_out[7:0], s[31], g_clr, g_clk, rbra_out[7:0]);
     n_bit_adder #(.n(8))                   DISP_ADDER(r_data1[7:0],psr0_out[15:8], disp_adder_out[7:0]);
-    MUX_mxn #(.d_width(8),.s_line(2))      DISP_MUX({psr0_out[15:8],rdata0[7:0],rdata1[7:0],disp_adder_out[7:0]}, {s[37],s[36]}, disp_mux_out[7:0]);
+    MUX_mxn #(.d_width(8),.s_line(2))      DISP_MUX(psr0_out[15:8],rdata0[7:0],rdata1[7:0],disp_adder_out[7:0]}, {s[37],s[36]}, disp_mux_out[7:0]);
     ls_reg                                 R_OUT (f[7:0], s[42], g_clr, g_clk, bus_out[7:0]);               // 8 bit r out
 
     ///////////////////
