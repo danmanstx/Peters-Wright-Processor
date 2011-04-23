@@ -118,10 +118,12 @@ module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
     MUX_mxn #(.d_width(8),.s_lines(1))  data_Cache_MUX ({disp_mux_out[7:0],psr1_out[22:15]}, s[45], dcache_addr_in[7:0]);  // 4x8 mux that feeds into the data cache address in
     */
     ///////////////////
-	// controller    //
-	///////////////////
-                                      //opcode, g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s
-	controller            cntrl (ir_out[15:10], g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s[50:0], psr0_out[28:24], psr1_out[24:23], pc_w);                     // this is the bad ass controller
-	MHVPIS                wtf ( {ext_int,s[25], psr1_out[0],psr1_out[1]}, mask_in, g_clr, i_en_out, i_pending, pc_out[7:0]);                         // hardware vector priority interrupt system
-                            // irupt_in, mask_in, clr, enable, i_pending, PC_out
+    // controller    
+    // and
+    // MHVPIS
+    ///////////////////
+
+    controller            CNTRL   (ir_out[15:10], g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s[50:0], psr0_out[28:24], psr1_out[24:23], pc_w);   // this is the controller
+    MHVPIS                INT_SYS ( {ext_int,s[25], psr1_out[0],psr1_out[1]}, mask_in, g_clr, i_en_out, i_pending, pc_out[7:0]);                            // hardware vector priority interrupt system
 endmodule
+
