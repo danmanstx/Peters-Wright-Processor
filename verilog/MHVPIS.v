@@ -9,6 +9,12 @@
 //
 //A maskable hardware vectorized priority interrupt system.
 //
+//  Priority:
+//    3- external interrupt signal
+//    2- illegal opcode
+//    1- overflow
+//    0- zero
+//
 ///////////////////////////////////////////////////////////////////////////////////////
 module MHVPIS(irupt_in, mask_in, clr, enable, i_pending, PC_out);
     input [3:0] irupt_in;               //4-bit vector for interrupt input signals
