@@ -11,17 +11,18 @@
 //                  functional units are called and connected here.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
+module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     // inputs
     input [7:0]  bus_in;      // this is an input that is called bus_in
-    input        hsk_in;      // this is an input used for handshaking
+    input        hs_in;       // this is an input used for handshaking
     input        g_clk;       // this is the clock input
-    input [3:0]  ext_int;     // this is an external interrupt input
+    input        ext_int;     // this is an external interrupt input
+    input        g_clr;       // global clear
     // outputs
     output [7:0] bus_out;     // this is an output called bus_out
-    output       hsk_out;     // this is another input used for handshaking
+    output       hs_out;     // this is another input used for handshaking
     //wires
-    wire [55:0]s;
+    wire [50:0]s;
     ///////////////////
     // stage one     //
     ///////////////////
@@ -40,10 +41,14 @@ module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
     wire        ien_out;
     wire [7:0]  ipcr_out;
     wire [7:0]  peek_out;
-	 wire [7:0] rbra_out;
+	wire [7:0]  rbra_out;
+    ////////////
+    // assigns for testing
+    //////////
+    assign i_odv = 1;
     // functional units
     RAM #(.d_width(16),.a_width(8))     I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
-    cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
+    //cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
     ls_reg #(.n(16))                    IR (icache_in[23:8], s[2], g_clr, g_clk, ir_out[15:0]);                                         // 16 bit instruction register
     sign_extend                         SEX (ir_out[5:0], sex_out[7:0]);                                                                // sign extend from IR to mux
     n_bit_PC #(.a_width(8))             PC (pc_in[7:0], {s[5],s[4]}, g_clr, g_clk, icache_in[7:0]);                                     //  8 bit program counter
@@ -53,6 +58,7 @@ module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
     stack                               RETURN_STACK (peek_out[7:0], icache_in[7:0], s[3], s[9], g_clk, g_clr, full, not_empty );       // return stack
     psr #(.size(34),.ri_lsb(8))         PSR0({ir_out[9:6],ir_out[5:2],psr0_in[7:0],icache_in[7:0],s[23:20],s[18:15],s[19]}, psr0_out[33:0], s[14], s[27], s[26], g_clr, g_clk); // pipeline stage register zero
     ls_reg #(.n(1))                     I_EN(s[11],s[10], g_clr, g_clk, ien_out);
+    /*
     ///////////////////
     // stage two     //
     ///////////////////
@@ -95,10 +101,9 @@ module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
     n_bit_adder #(.n(8))                   BRANCH_ADDER(psr0_out[23:16], psr0_out[15:8], branch_adder_out[7:0]);
     MUX_mxn #(.d_width(8),.s_lines(2))     BRANCH_MUX({psr0_out[15:8],rdata0[7:0],branch_adder_out[7:0],rdata1[7:0]}, {s[34],s[33]}, branch_mux_out[7:0]);
     ls_reg #(.n(8))                        RBRA (branch_mux_out[7:0], s[31], g_clr, g_clk, rbra_out[7:0]);
-    n_bit_adder #(.n(8))                   DISP_ADDER(r_data1[7:0],psr0_out[15:8], disp_adder_out[7:0]);
-    MUX_mxn #(.d_width(8),.s_line(2))      DISP_MUX(psr0_out[15:8],rdata0[7:0],rdata1[7:0],disp_adder_out[7:0]}, {s[37],s[36]}, disp_mux_out[7:0]);
+    n_bit_adder #(.n(8))                   DISP_ADDER(rdata1[7:0],psr0_out[15:8], disp_adder_out[7:0]);
+    MUX_mxn #(.d_width(8),.s_lines(2))      DISP_MUX({psr0_out[15:8],rdata0[7:0],rdata1[7:0],disp_adder_out[7:0]}, {s[37],s[36]}, disp_mux_out[7:0]);
     ls_reg                                 R_OUT (f[7:0], s[42], g_clr, g_clk, bus_out[7:0]);               // 8 bit r out
-
     ///////////////////
     // stage three   //
     ///////////////////
@@ -116,14 +121,13 @@ module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
     ls_reg #(.n(8))                     MDR(buffer_out[7:0], s[41], g_clr, g_clk, mdr_out[7:0]);
 
     MUX_mxn #(.d_width(8),.s_lines(1))  data_Cache_MUX ({disp_mux_out[7:0],psr1_out[22:15]}, s[45], dcache_addr_in[7:0]);  // 4x8 mux that feeds into the data cache address in
-
+   
     ///////////////////
     // controller
     // and
     // MHVPIS
     ///////////////////
-
+    */
     controller            CNTRL   (ir_out[15:10], g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s[50:0], psr0_out[28:24], psr1_out[24:23], pc_w);   // this is the controller
-    MHVPIS                INT_SYS ( {ext_int,s[25], psr1_out[0],psr1_out[1]}, mask_in, g_clr, i_en_out, i_pending, pc_out[7:0]);                            // hardware vector priority interrupt system
+    MHVPIS                INT_SYS ( {ext_int,s[25], psr1_out[0],psr1_out[1]}, mask_in, g_clr, ien_out, i_pending, pc_out[7:0]);                            // hardware vector priority interrupt system
 endmodule
-
