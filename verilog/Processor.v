@@ -50,7 +50,7 @@ module Processor(bus_in, ext_int, bus_out, hsk_in, hsk_out, g_clk);
     MUX_mxn #(.d_width(8),.s_lines(2))  PSR0_MUX ({ir_out[15:7],ir_out[9:2],sex_out[7:0],8'h00}, {s[13],s[12]}, psr0_in[7:0]);          // 4x8 mux for pipelined stage register instruction
     ls_reg #(.n(8))                     IPCR (icache_in[7:0], s[3], g_clr, g_clk, ipcr_out[7:0]);                                       // 8 bit interrupt program counter  register
     stack                               RETURN_STACK (peek_out[7:0], icache_in[7:0], s[3], s[9], g_clk, g_clr, full, not_empty );       // return stack
-    psr0                                PSR0({ir_out[9:6],ir_out[5:2],psr0_in[7:0],icache_in[7:0],s[23:20],s[18:15],s[19]}, psr0_out[32:0], s[14], /*c_right*/, s[25], g_clr, g_clk); // pipeline stage register zero
+    psr #(.size(34),.ri_lsb(8))         PSR0({ir_out[9:6],ir_out[5:2],psr0_in[7:0],icache_in[7:0],s[23:20],s[18:15],s[19]}, psr0_out[33:0], s[14], s[27], s[26], g_clr, g_clk); // pipeline stage register zero
     ls_reg #(.n(1))                     I_EN(s[11],s[10], g_clr, g_clk, ien_out);
     ///////////////////
     // stage two     //
