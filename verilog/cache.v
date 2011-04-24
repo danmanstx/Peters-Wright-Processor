@@ -95,6 +95,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
             rw_in_reg <= rw_in;
             data_in_reg <= data_in;
             addr_in_reg <= addr_in;
+            sel_reg <= sel;
             case(state)
                 0: begin
                     if(hit == 1)
@@ -106,9 +107,9 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 end
                 1:  begin
                     if(rw_in == 1)
-                        state <= 2; //read
+                        state <= 4; //read
                     else 
-                        state <= 4; //write
+                        state <= 2; //write
                 end
                 2:  state <= 3;
                 3:  state <= 6;
@@ -121,9 +122,9 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 10: state <= 0;
                 11: begin
                     if(rw_in == 1)
-                        state <= 2; //read
+                        state <= 4; //read
                     else
-                        state <= 4; //write
+                        state <= 2; //write
                 end
                 default: state <= 0;
             endcase
@@ -144,7 +145,6 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 rw_out <= 0;
                 data_out_reg <= 0;
                 addr_out <= 0;
-                sel_reg <= sel;
 
                 if(hit == 1)    //hit
                 begin
