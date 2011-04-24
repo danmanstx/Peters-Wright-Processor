@@ -21,8 +21,10 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
     input [a_width-1:0] addr_in;        //address in
     reg [a_width-1:0] addr_in_reg;      //register that stores address in
     inout [d_width-1:0] data_in;        //data bus into the cache
-    reg [d_width-1:0] data_in_reg;      //data in register (for output)
+    reg [d_width-1:0] data_in_reg;      //data in register
+    reg [d_width-1:0] data_inout_reg;   //data in register (for output)
     input rw_in;                        //read if rw=1 write if rw=0
+    reg rw_in_reg;                      //store rw
     input ce_in;                        //chip enable (func. when ce=1, HiZ when ce=0)
 
     //outputs to RAM
@@ -49,7 +51,6 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
     wire [1:0] sel;                 //sel=i if hit at entry i
     reg [1:0] sel_reg;              //register to store sel between ccs
     wire [3:0] dec;                 //dec[i]=1 if decrementing cnt[i]
-    integer i;
 
     //wire wrappers
     wire [(a_width*4)-1:0] w_addr;
@@ -64,17 +65,23 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
     assign w_cnt[7:6] = cnt[3];
     
     //modules
-    determine_hit DETERMINE_HIT (addr_in, _addr, _cnt, valid, sel, dec, hit);
+    determine_hit DETERMINE_HIT (addr_in, w_addr, w_cnt, valid, sel, dec, hit);
     
     /////////////////////////////////////////
     //FSM
     /////////////////////////////////////////
     always@(posedge clk)
     begin
-        if(clr == 0)
+        if(clr == 0 || ce = 0)
             state <= 0;
+            rw_in_reg <= 0;
+            data_in_reg <= 0;
+            addr_in_reg <= 0;
         else
         begin
+            rw_in_reg <= rw_in
+            data_in_reg <= data_in;
+            addr_in_reg <= addr_in;
             case(state)
             0: begin
                 if(hit == 1)
@@ -86,21 +93,184 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 if(rw == 1)
                     state <= 2;
                 else
-                    state <= 3;
+                    state <= 4;
             end
-            2:  state <= 4;
-            3:  state <= 4;
+            2:  state <= 3;
+            3:  state <= 6;
             4:  state <= 5;
             5:  state <= 6;
             6:  state <= 7;
             7:  state <= 8;
-            8:  state <= 0;
+            8:  state <= 9;
+            9:  state <= 0;
             default: state <= 0;
         end
     end
     
     /////////////////////////////////////////
-    //FSM
+    //State outputs
     /////////////////////////////////////////
+    always@(negedge clk)
+    begin
+        case(state)
+        0:
+        begin
+            ce_out <= 0;
+            rw_out <= 0;
+            data_out_reg <= 0;
+            addr_out_reg <= 0;
+            sel_reg <= sel;
+
+            if(hit == 1)    //hit
+            begin
+                odv <= 1;
+                if(dec[0] == 1 && sel != 0)
+                    cnt[0] <= cnt[0] - 1;
+                if(dec[1] == 1 && sel != 1)
+                    cnt[1] <= cnt[1] - 1;
+                if(dec[2] == 1 && sel != 2)
+                    cnt[2] <= cnt[2] - 1;
+                if(dec[3] == 1 && sel != 3)
+                    cnt[3] <= cnt[3] - 1;
+                cnt[sel] <= 2'b11;
+                if(rw == 0) //write
+                    data[sel] <= data_in_reg;
+                else        //read
+                    data_inout_reg <= data[sel];
+            end
+            else            //miss
+            begin
+                odv <= 0;
+            end
+        end
+        1:
+        begin
+            //write to RAM
+            odv <= 0;
+            ce_out <= 1;
+            rw_out <= 0;
+            data_out_reg <= data[sel_reg];
+            addr_out_reg <= addr[sel_reg];
+        end
+        2:
+        begin
+            //write from bus to cache
+            odv <= 0;
+            ce_out <= 0;
+            rw_out <= 0;
+            data_out_reg <= 0;
+            addr_out_reg <= 0;
+            data[sel_reg] <= data_in_reg;
+            valid[sel_reg] <= 1;
+            addr[sel_reg] <= addr_in_reg;
+            if(sel_reg != 0)
+                cnt[0] <= cnt[0] - 1;
+            else
+                cnt[0] <= 2'b11;
+            if(sel_reg != 1)
+                cnt[1] <= cnt[1] - 1;
+            else
+                cnt[1] <= 2'b11;
+            if(sel_reg != 2)
+                cnt[2] <= cnt[2] - 1;
+            else
+                cnt[2] <= 2'b11;
+            if(sel_reg != 3)
+                cnt[3] <= cnt[3] - 1;
+            else
+                cnt[3] <= 2'b11;
+        end
+        3:
+        begin
+            //do nothing
+            odv <= 0;
+            ce_out <= 0;
+        end
+        4:
+        begin
+            //write from RAM to cache
+            odv <= 0;
+            ce_out <= 1;
+            rw_out <= 1;
+            data_out_reg <= data_in_reg;
+            addr_out_reg <= addr_in_reg;
+        end
+        5:
+        begin
+            //write what is on the RAM lines
+            odv <= 0;
+            ce_out <= 0;
+            rw_out <= 0;
+            data_out_reg <= 0;
+            addr_out_reg <= 0;
+            data[sel_reg] <= data_out;
+            //write data to cache bus
+            data_inout_reg <= data_out;
+            valid[sel_reg] <= 1;
+            addr[sel_reg] <= addr_in_reg;
+            if(sel_reg != 0)
+                cnt[0] <= cnt[0] - 1;
+            else
+                cnt[0] <= 2'b11;
+            if(sel_reg != 1)
+                cnt[1] <= cnt[1] - 1;
+            else
+                cnt[1] <= 2'b11;
+            if(sel_reg != 2)
+                cnt[2] <= cnt[2] - 1;
+            else
+                cnt[2] <= 2'b11;
+            if(sel_reg != 3)
+                cnt[3] <= cnt[3] - 1;
+            else
+                cnt[3] <= 2'b11;
+        end
+        6:
+        begin
+            //do nothing
+            odv <= 0;
+            ce_out <= 0;
+        end
+        7:
+        begin
+            //do nothing
+            odv <= 0;
+            ce_out <= 0;
+        end
+        8:
+        begin
+            //do nothing
+            odv <= 0;
+            ce_out <= 0;
+        end
+        9:
+        begin
+            //data is valid
+            odv <= 1;
+            ce_out <= 0;
+        end
+        default:
+        begin
+            //do nothing
+            odv <= 0;
+            ce_out <= 0;
+        end
+        endcase
+    end
+
+    genvar i;
+    wire i_bufc;    //in buffer control
+    wire o_bufc;    //out buffer control
+
+    assign i_bufc = ~rw_in;
+    assign o_bufc = rw_out;
+
+    generate
+    for(i = 0; i < d_width; i = i + 1)
+    begin
+        bufif1 (data_out,data_out_reg,o_bufc);
+        bufif1 (data_in,data_inout_reg,i_bufc);
+    end
+    endgenerate
 
 endmodule
