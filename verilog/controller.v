@@ -65,9 +65,9 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s, s
     ///////////////////////////////////////////////////////
     always @ (posedge clk)
     begin
-		if(clr == 0)	state0 <= 0;
-		else
-		begin
+        if(clr == 0)    state0 <= 0;
+        else
+        begin
             case(state0)
             T0:
             begin
@@ -268,9 +268,9 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s, s
     /////////////////////////
     always @(posedge clk)
     begin
-		if(clr == 0)	state0 <= 0;
-		else
-		begin
+        if(clr == 0)	state1 <= 0;
+        else
+        begin
         case(state1)
         T0:
         begin
@@ -362,7 +362,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s, s
             else           state1 <= T0;
         default: state1 <= T0;
         endcase
-		 end
+        end
     end
     /////////////////////////////////////////
     // logic for second stage state
@@ -410,9 +410,9 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s, s
     ////////////////////////
     always @ (posedge clk)
     begin
-	 	if(clr == 0)	state0 <= 0;
-		else
-		begin
+        if(clr == 0)	state2 <= 0;
+        else
+        begin
         case(state2)
         T0:
             if(ps1r == 1)
