@@ -42,10 +42,10 @@ module MHVPIS(irupt_in, mask_in, clr, enable, i_pending, PC_out);
     begin
         if(clr == 0)
         begin
-            addresses[7:0] = 8'b00010001;   //arbitrary values for testing purposes
-            addresses[15:8] = 8'b00110011;  //...
-            addresses[23:16] = 8'b11110000; //...
-            addresses[31:24] = 8'b10101010; //...
+            addresses[7:0] = 8'b00010001;   //isr0 --> zero ALU out interrupt service routine
+            addresses[15:8] = 8'b00110011;  //isr1 --> arithmetic overflow interrupt service routine
+            addresses[23:16] = 8'b11110000; //isr2 --> illegal opcode interrupt service routine
+            addresses[31:24] = 8'b10101010; //isr3 --> external interrupt service routine
         end
     end
     

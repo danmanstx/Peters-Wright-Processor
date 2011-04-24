@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
             yyin = fopen(argv[3],"r");
             outfile = fopen(argv[2],"w");
         
-        } else if(strcmp(argv[1],"-m") == 0) {
+        } else if(strcmp(argv[1],"-mi") == 0) {
             //enable debug output
             flag_debug = true;
             //create verilog module

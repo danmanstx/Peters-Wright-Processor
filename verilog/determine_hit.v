@@ -35,7 +35,8 @@ module determine_hit(addr, w_entry_addrs, w_cnt, valid, sel, dec, hit);
     assign cnt[2] = w_cnt[5:4];
     assign cnt[3] = w_cnt[7:6];
     
-    always@(addr or w_entry_addrs or valid or w_cnt)
+    always@(addr or entry_addrs[0] or entry_addrs[1] or entry_addrs[2] or entry_addrs[3]
+        or valid or cnt[0] or cnt[1] or cnt[2] or cnt[3])
     begin
         if((addr == entry_addrs[0]) && (valid[0] == 1))
         begin
