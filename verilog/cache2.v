@@ -72,38 +72,41 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
     /////////////////////////////////////////
     always@(posedge clk)
     begin
-        if(clr == 0 || ce = 0)
+        if(clr == 0 || ce_in == 0)
+        begin
             state <= 0;
             rw_in_reg <= 0;
             data_in_reg <= 0;
             addr_in_reg <= 0;
+        end
         else
         begin
-            rw_in_reg <= rw_in
+            rw_in_reg <= rw_in;
             data_in_reg <= data_in;
             addr_in_reg <= addr_in;
             case(state)
-            0: begin
-                if(hit == 1)
-                    state <= 0;
-                else
-                    state <= 1;
-            end
-            1:  begin
-                if(rw == 1)
-                    state <= 2;
-                else
-                    state <= 4;
-            end
-            2:  state <= 3;
-            3:  state <= 6;
-            4:  state <= 5;
-            5:  state <= 6;
-            6:  state <= 7;
-            7:  state <= 8;
-            8:  state <= 9;
-            9:  state <= 0;
-            default: state <= 0;
+                0: begin
+                    if(hit == 1)
+                        state <= 0;
+                    else
+                        state <= 1;
+                end
+                1:  begin
+                    if(rw_in == 1)
+                        state <= 2;
+                    else
+                        state <= 4;
+                end
+                2:  state <= 3;
+                3:  state <= 6;
+                4:  state <= 5;
+                5:  state <= 6;
+                6:  state <= 7;
+                7:  state <= 8;
+                8:  state <= 9;
+                9:  state <= 0;
+                default: state <= 0;
+            endcase
         end
     end
     
@@ -118,7 +121,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
             ce_out <= 0;
             rw_out <= 0;
             data_out_reg <= 0;
-            addr_out_reg <= 0;
+            addr_out <= 0;
             sel_reg <= sel;
 
             if(hit == 1)    //hit
@@ -133,7 +136,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 if(dec[3] == 1 && sel != 3)
                     cnt[3] <= cnt[3] - 1;
                 cnt[sel] <= 2'b11;
-                if(rw == 0) //write
+                if(rw_in_reg == 0) //write
                     data[sel] <= data_in_reg;
                 else        //read
                     data_inout_reg <= data[sel];
@@ -150,7 +153,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
             ce_out <= 1;
             rw_out <= 0;
             data_out_reg <= data[sel_reg];
-            addr_out_reg <= addr[sel_reg];
+            addr_out <= addr[sel_reg];
         end
         2:
         begin
@@ -159,7 +162,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
             ce_out <= 0;
             rw_out <= 0;
             data_out_reg <= 0;
-            addr_out_reg <= 0;
+            addr_out <= 0;
             data[sel_reg] <= data_in_reg;
             valid[sel_reg] <= 1;
             addr[sel_reg] <= addr_in_reg;
@@ -193,7 +196,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
             ce_out <= 1;
             rw_out <= 1;
             data_out_reg <= data_in_reg;
-            addr_out_reg <= addr_in_reg;
+            addr_out <= addr_in_reg;
         end
         5:
         begin
@@ -202,7 +205,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
             ce_out <= 0;
             rw_out <= 0;
             data_out_reg <= 0;
-            addr_out_reg <= 0;
+            addr_out <= 0;
             data[sel_reg] <= data_out;
             //write data to cache bus
             data_inout_reg <= data_out;
