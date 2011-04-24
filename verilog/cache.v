@@ -77,10 +77,6 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
         begin
             for(i = 0; i < 4; i = i + 1)
             begin
-                addr[i] <= 0;
-                data[i] <= 0;
-                valid[i] <= 0;
-                cnt[i] <= 0;
                 rw_in_reg <= 0;
                 data_in_reg <= 0;
                 addr_in_reg <= 0;
@@ -122,9 +118,9 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 10: state <= 0;
                 11: begin
                     if(rw_in == 1)
-                        state <= 4; //read
+                        state <= 2; //read
                     else
-                        state <= 2; //write
+                        state <= 4; //write
                 end
                 default: state <= 0;
             endcase
@@ -136,6 +132,13 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
     /////////////////////////////////////////
     always@(negedge clk)
     begin
+        if(clr == 0)
+        begin
+            addr[i] <= 0;
+            data[i] <= 0;
+            valid[i] <= 0;
+            cnt[i] <= 0;
+        end
         if(ce_in == 1)
         begin
             case(state)
