@@ -18,7 +18,7 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module stack(peek, push, c, en, clk, clr,  full, not_empty);
+module stack(peek, push, c, en, clk, clr);
 parameter width = 8;
 parameter depth = 1;
 input                     c;               // this is the control line
@@ -27,14 +27,14 @@ input                   clk;               // this is a clocked input
 input                   clr;               // this is for the global clear
 input      [width-1:0] push;               // get the value in to push
 output reg [width-1:0] peek;               // the value that would be popped
-output reg             full;               // output that is 1 if the stack is full and 0 otherwise
-output reg        not_empty;               // output that is 1 when the stack isn't empty and 0 when it is
+reg             full;               // output that is 1 if the stack is full and 0 otherwise
+reg        not_empty;               // output that is 1 when the stack isn't empty and 0 when it is
 reg        [depth-1:0]  ptr;               // stack pointer
 reg        [width-1:0] data [(2**depth)-1:0];   // this is a register that holds the data
 integer i;
 always @(posedge clk)
 begin
-    if(clr)
+    if(clr == 0)
     begin
         for(i=0;i<(2**depth)-1;i=i+1)
         begin
@@ -65,10 +65,6 @@ begin
                         not_empty <= 0;
                     else
                         not_empty <= 1;
-                end
-                else
-                begin
-                
                 end
             else       // c=1, push
                 if(full == 0)

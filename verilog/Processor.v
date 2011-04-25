@@ -65,7 +65,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     stack #(.width(8),.depth(2))        RETURN_STACK ( peek_out[7:0], icache_in[7:0], s[8], s[9], g_clk, g_clr);       // return stack
     psr #(.size(34),.ri_lsb(8))         PSR0( {s[19],s[18:15],s[24:20],icache_in[7:0],psr0_in[7:0],ir_out[5:2],ir_out[9:6]}, psr0_out[33:0], s[14], s[27], s[26], g_clr, g_clk); // pipeline stage register zero
     ls_reg #(.n(1))                     I_EN( s[11], s[10], g_clr, g_clk, ien_out);
-    
+ 
     ///////////////////
     // stage two     //
     ///////////////////
@@ -121,13 +121,15 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     wire        or_out;
     // functional units
     ls_reg #(.n(4))                     IR_MASK ( psr1_out[21:14], s[49], g_clr, g_clk, mask_in[3:0]);                 // IR mask register
-    //RAM #(.d_width(8),.a_width(8))      D_RAM   ( dram_in[7:0], dram_in[8], g_clk, g_clr, dram_in[9], dram_in[17:10]);   // 256x8 data random access memory
+    //RAM #(.d_width(8),.a_width(8))    D_RAM   ( dram_in[7:0], dram_in[8], g_clk, g_clr, dram_in[9], dram_in[17:10]);   // 256x8 data random access memory
     RAM #(.d_width(8),.a_width(8))      D_RAM   ( dcache_addr_in[7:0], or_out, g_clk, g_clr, s[46], buffer_out[7:0]);   // 256x8 data random access memory
-    //cache                               D_CACHE ( dcache_addr_in[7:0], buffer_out[7:0], s[46], or_out, dram_in[7:0], dram_in[17:10], dram_in[9], dram_in[8], d_odv, g_clr, g_clk);  // 4x8 data cache
+    //cache                             D_CACHE ( dcache_addr_in[7:0], buffer_out[7:0], s[46], or_out, dram_in[7:0], dram_in[17:10], dram_in[9], dram_in[8], d_odv, g_clr, g_clk);  // 4x8 data cache
     or                                  OR_GATE ( or_out, s[47],s[40]);
     ls_reg #(.n(8))                     MDR     ( buffer_out[7:0], s[41], g_clr, g_clk, mdr_out[7:0]);
     MUX_mxn #(.d_width(8),.s_lines(1))  data_Cache_MUX ({psr1_out[21:14],disp_mux_out[7:0]}, s[45], dcache_addr_in[7:0]);  // 4x8 mux that feeds into the data cache address in
-   
+    /////////////////////////////////
+    // generate for tristate buffers
+    /////////////////////////////////
     genvar x;
     generate
     for(x = 0; x < 8; x = x+1)
@@ -140,7 +142,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     // and
     // MHVPIS
     ///////////////////
-    
+
     controller            CNTRL   (ir_out[15:10], g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s[50:0], psr0_out[28:24], psr1_out[24:23], pc_w);   // this is the controller
     MHVPIS                INT_SYS ( {psr1_out[1],psr1_out[0],s[25],ext_int}, mask_in, g_clr, ien_out, i_pending, interrupt_out[7:0]);                            // hardware vector priority interrupt system
 endmodule
