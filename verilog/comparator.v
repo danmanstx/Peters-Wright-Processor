@@ -19,6 +19,6 @@ module comparator(A, B, En, out);
     input En;                       // chip enable
     output out;                     // output out
     
-    assign out = (En && A>=B) ?  1:0;   // if enable and a >= b then output one, else zero
+    assign out = (En && A==B) ?  1:0;   // if enable and a >= b then output one, else zero
     
 endmodule
