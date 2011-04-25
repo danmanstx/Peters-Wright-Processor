@@ -88,8 +88,4 @@ module testbench_cache(clk, clr);
     end
     endgenerate
     
-    
-    
-    
-    
 endmodule
