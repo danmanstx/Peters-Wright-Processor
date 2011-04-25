@@ -135,8 +135,8 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
             begin
                 addr[i] <= 0;
                 data[i] <= 0;
-                cnt[i] <= 0;
                 valid[i] <= 0;
+                cnt[i] <= 0;
             end
         end
         if(ce_in == 1)
@@ -189,6 +189,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 data_out_reg <= 0;
                 addr_out <= 0;
                 data[sel_reg] <= data_in_reg;
+                valid[sel_reg] <= 1;
                 addr[sel_reg] <= addr_in_reg;
                 if(sel_reg != 0)
                     cnt[0] <= cnt[0] - 1;
@@ -233,6 +234,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 data[sel_reg] <= data_out;
                 //write data to cache bus
                 data_inout_reg <= data_out;
+                valid[sel_reg] <= 1;
                 addr[sel_reg] <= addr_in_reg;
                 if(sel_reg != 0)
                     cnt[0] <= cnt[0] - 1;

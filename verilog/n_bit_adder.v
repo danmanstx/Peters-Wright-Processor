@@ -27,7 +27,7 @@ module n_bit_adder(a,b,s);
     end
     endgenerate
 
-    XOR finalbitslice(s[n-1],a[n-1],b[n-1],c[n-1]);
+    xor finalbitslice(s[n-1],a[n-1],b[n-1],c[n-1]);
 
 endmodule
 
