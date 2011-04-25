@@ -32,7 +32,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     genvar j;
     generate
     for(j=0;j<51;j=j+1)
-    begin:omfg
+    begin:reverse_s
         assign s_w[j] = s[50-j]; 
     end
     endgenerate
@@ -205,7 +205,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
             end
             default: state0 <= T0;
             endcase
-			end
+            end
     end
     ///////////////////////////////////////////
     // always block for first state machine's
@@ -438,7 +438,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
         T3:  state2 <= T0;
         default: state2 <= T0;
         endcase
-		 end
+        end
     end
 
     ////////////////////////////////
