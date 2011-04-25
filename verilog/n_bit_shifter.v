@@ -16,7 +16,7 @@
 module n_bit_shifter(a, b, f, ctrl);
     parameter max_s_bits = 3;           //d_width = 2**max_s_bits
     input [(2**max_s_bits)-1:0] a;      //A input (data to shift)
-    input [(2**max_s_bits)-1:0] b;      //B input (shifting input)
+    input [max_s_bits-1:0] b;      //B input (shifting input)
     output [(2**max_s_bits)-1:0] f;     //output
     input ctrl;                         //ctrl input
     

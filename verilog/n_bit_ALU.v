@@ -60,7 +60,7 @@ module n_bit_ALU(a, b, cin, ctrl, f, cout, v, z);
     genvar i;
     
     assign w_sel = (ctrl[2] & ~ctrl[1] & ~ctrl[0]) | (ctrl[2] & ctrl[1] & ctrl[0]);
-    n_bit_shifter #(.max_s_bits(m)) SHIFTER (a, b, w_2, cin);
+    n_bit_shifter #(.max_s_bits(m)) SHIFTER (a, b[m-1:0], w_2, cin);
     MUX_mxn #(.d_width(n),.s_lines(1)) SELMUX ({b,a} , cin, w_3);
     MUX_mxn #(.d_width(n),.s_lines(1)) SHIFTMUX0 ({w_3,w_2} , ctrl[0], w_1);
     MUX_mxn #(.d_width(n),.s_lines(1)) SHIFTMUX1 ({w_1,w_0} , w_sel, f);

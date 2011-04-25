@@ -41,17 +41,17 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     wire        ien_out;
     wire [7:0]  ipcr_out;
     wire [7:0]  peek_out;
-	wire [7:0]  rbra_out;
+    wire [7:0]  rbra_out;
     ////////////--------------------------------------------------------------------------------------------
-    // assigns for testing
+    //assigns for testing
     //////////
-    assign i_odv=1;
+    //assign i_odv=1;
     ////////////--------------------------------------------------------------------------------------------*/
     
     // functional units
-    RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
-    //RAM_bubblesort #(.d_width(16),.a_width(8))   I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
-    //cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
+    //RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    RAM_bubblesort #(.d_width(16),.a_width(8))   I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
+    cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
     ls_reg #(.n(16))                    IR (icache_in[23:8], s[2], g_clr, g_clk, ir_out[15:0]);                                         // 16 bit instruction register
     sign_extend                         SEX (ir_out[5:0], sex_out[7:0]);                                                                // sign extend from IR to mux
     n_bit_PC #(.a_width(8))             PC (pc_in[7:0], {s[5],s[4]}, g_clr, g_clk, icache_in[7:0]);                                     //  8 bit program counter
@@ -88,7 +88,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     wire [7:0] disp_adder_out;
     wire [7:0] disp_mux_out;
 
-    //functional units
+    /*/functional units
     register_file                          REG_FILE ( s[48],psr0_out[3:0], psr0_out[7:4], psr1_out[6:3], psr1_out[14:7], g_clr, g_clk, rdata0[7:0], rdata1[7:0]);      // register file 
     comparator #(.width(4))                CMP_A (psr0_out[3:0], psr1_out[6:3], psr1_out[23], cmp_out_a);             // comparator for mux 2x8 that feeds later into alu input A
     comparator #(.width(4))                CMP_B (psr0_out[3:0], psr1_out[6:3], psr1_out[23], cmp_out_b);             // comparator for mux 2x8 that feeds later into alu input B
