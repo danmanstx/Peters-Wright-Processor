@@ -15,18 +15,19 @@ module n_bit_adder(a,b,s);
     input [n-1:0] a;
     input [n-1:0] b;
     output [n-1:0] s;
-    wire [n:0] c;
-
+    wire [n-1:0] c;
 
     genvar i;
     assign c[0]=0;
 
     generate
-    for(i=0; i < n; i=i+1)
+    for(i=0; i < n-1; i=i+1)
     begin:startgen
         BFA bitslice(a[i],b[i],c[i],s[i],c[i+1]);
     end
     endgenerate
+
+    XOR finalbitslice(s[n-1],a[n-1],b[n-1],c[n-1]);
 
 endmodule
 

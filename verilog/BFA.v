@@ -5,7 +5,7 @@
 //EE480 Spring 2011
 //DV Final Project
 //
-//ALU_bitslice.v
+//BFA.v
 //
 //A binary full adder.
 //
