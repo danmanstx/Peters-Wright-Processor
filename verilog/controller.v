@@ -27,13 +27,13 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     /////////////////////////
     // outputs
     ////////////////////////
-    reg [0:51] s;
-    output [0:51] s_w;
+    reg [0:52] s;
+    output [0:52] s_w;
     genvar j;
     generate
-    for(j=0;j<52;j=j+1)
+    for(j=0;j<53;j=j+1)
     begin:reverse_s
-        assign s_w[j] = s[51-j]; 
+        assign s_w[j] = s[52-j]; 
     end
     endgenerate
     
@@ -270,7 +270,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
             T53: s[0:26] = 27'b111001000000000000000000001;
             T54: s[0:26] = 27'b110011000000000000000000000;
             default: s[0:26] = 27'b00000000000000000000000000;
-            endcase
+        endcase
     end
     //////////////////////////
     // state machine 2
@@ -410,6 +410,10 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
             T32: s[27:44] = 18'b100001000000000011;
             default: s[27:44] = 18'b000000000000000000;
         endcase
+        if(state1 == T0 && ps0r == 1)
+            s[52] = 1;
+        else
+            s[52] = 0;
     end
     ////////////////////////
     // third stage state

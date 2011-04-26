@@ -70,7 +70,7 @@ module stack(peek, push, c, en, clk, clr);
                         else
                         begin
                             empty <= 0;
-                            peek <= [ptr-1];
+                            peek <= data[ptr-1];
                             ptr <= ptr-1;
                             full <= 0;
                         end
