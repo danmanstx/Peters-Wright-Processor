@@ -60,13 +60,6 @@ module stack(peek, push, c, en, clk, clr);
                 begin
                     if(empty == 0)
                     begin
-                        /*full <= 0;
-                        ptr <= ptr - 1;
-                        peek <= data[ptr-1];
-                        if(ptr-1 == 0)
-                            not_empty <= 0;
-                        else
-                            not_empty <= 1;*/
                         if(ptr == 0)
                         begin
                             empty <= 1;
@@ -95,13 +88,6 @@ module stack(peek, push, c, en, clk, clr);
                     end
                     else if(full == 0)
                     begin
-                        /*empty <= 1;
-                        ptr <= ptr + 1;
-                        data[ptr+1] <= push;
-                        if(ptr == (2**depth)-2)
-                            full <= 1;
-                        else
-                            full <= 0;*/
                         if(ptr == (2**depth)-2)
                         begin
                             empty <= 0;
