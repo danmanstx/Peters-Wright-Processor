@@ -29,7 +29,7 @@ module ALU_bitslice(a, b, cin, ctrl, fout, cout);
     
     wire [7:0] w;       //wires
     
-    xor XOR0 (w[0],b,cin);  //w[0] = ~b when cin = 1, else w[0] = b
+    assign w[0] = b;
     BFA BFA0 (a,b,cin,w[1],w[6]);
     or OR0 (w[2],a,w[0]);
     and AND0 (w[3],a,w[0]);
