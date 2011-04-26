@@ -268,7 +268,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
             T51: s[0:26] = 27'b000000000000001000000000010;
             T52: s[0:26] = 27'b111000000000000000000000000;
             T53: s[0:26] = 27'b111001000000000000000000001;
-            T54: s[0:26] = 27'b110011000000000000000000000;
+            T54: s[0:26] = 27'b111011000000000000000000000;
             default: s[0:26] = 27'b00000000000000000000000000;
         endcase
     end
@@ -410,10 +410,10 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
             T32: s[27:44] = 18'b100001000000000011;
             default: s[27:44] = 18'b000000000000000000;
         endcase
-        if(state1 == T0 && ps0r == 1)
-            s[52] = 1;
-        else
-            s[52] = 0;
+        //if(state1 == T0 && ps0r == 1)
+        //    s[52] = 1;
+        //else
+        //    s[52] = 0;
     end
     ////////////////////////
     // third stage state

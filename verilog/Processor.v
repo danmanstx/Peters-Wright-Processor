@@ -44,6 +44,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     wire [7:0]  rbra_out;
     wire        i_odv;
     wire        d_odv;
+    wire        bubble;
     ////////////--------------------------------------------------------------------------------------------
     // assigns for testing
     ////////////
@@ -65,7 +66,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     MUX_mxn #(.d_width(8),.s_lines(2))  PSR0_MUX ( {8'h00,sex_out[7:0],ir_out[9:2],ir_out[15:8]}, {s[13],s[12]}, psr0_in[7:0]);          // 4x8 mux for pipelined stage register instruction
     ls_reg #(.n(8))                     IPCR ( icache_in[7:0], s[3], g_clr, g_clk, ipcr_out[7:0]);                                       // 8 bit interrupt program counter  register
     stack #(.width(8),.depth(2))        RETURN_STACK ( peek_out[7:0], icache_in[7:0], s[8], s[9], g_clk, g_clr);       // return stack
-    psr #(.size(34),.ri_lsb(8))         PSR0( {s[19],s[18:15],s[24:20],icache_in[7:0],psr0_in[7:0],ir_out[5:2],ir_out[9:6]}, psr0_out[33:0], s[14], s[27], s[26], pc_w, s[52], g_clr, g_clk); // pipeline stage register zero
+    psr #(.size(34),.ri_lsb(8))         PSR0( {s[19],s[18:15],s[24:20],icache_in[7:0],psr0_in[7:0],ir_out[5:2],ir_out[9:6]}, psr0_out[33:0], s[14], s[27], s[26], 0'b0, s[52], g_clr, g_clk); // pipeline stage register zero
     ls_reg #(.n(1))                     I_EN( s[11], s[10], g_clr, g_clk, ien_out);
  
     ///////////////////
@@ -113,7 +114,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     n_bit_adder #(.n(8))                   DISP_ADDER(rdata1[7:0],psr0_out[15:8], disp_adder_out[7:0]);
     MUX_mxn #(.d_width(8),.s_lines(2))     DISP_MUX({disp_adder_out[7:0],rdata1[7:0],rdata0[7:0],psr0_out[15:8]}, {s[37],s[36]}, disp_mux_out[7:0]);
     ls_reg                                 R_OUT (f[7:0], s[42], g_clr, g_clk, bus_out[7:0]);               // 8 bit r out
-    
+    or                                     BUBBLE_OR (bubble, pc_w, pc_w_in);
     ///////////////////
     // stage three   //
     ///////////////////

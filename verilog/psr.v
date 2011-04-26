@@ -28,7 +28,7 @@ module psr(in, out, c_left, c_right, ld_ri, bubble, bubble_clr, clr, clk);
     input clr;
     input clk;
     
-    reg bubble_reg;
+    reg [1:0] bubble_reg;
     
     always@(posedge clk)
     begin
@@ -38,11 +38,11 @@ module psr(in, out, c_left, c_right, ld_ri, bubble, bubble_clr, clr, clk);
             in_data <= 0;
             bubble_reg <= 0;
         end
-        else if(bubble == 1 && bubble_reg == 0)
+        else if(bubble == 1)
         begin
             out <= 0;
             in_data <= 0;
-            bubble_reg <= 1;
+            bubble_reg <= 2;
         end
         else
         begin
@@ -56,9 +56,9 @@ module psr(in, out, c_left, c_right, ld_ri, bubble, bubble_clr, clr, clk);
                 in_data <= in;
             else                    //store
                 in_data <= in_data;
-            if(bubble_clr == 1 && bubble_reg == 1)     //bubble
+            if(bubble_clr == 1 && bubble_reg != 0)     //bubble
             begin
-                bubble_reg <= 0;
+                bubble_reg <= bubble_reg - 1;
             end
             else if(c_right == 1)                   //shift right
                 out <= in_data;
