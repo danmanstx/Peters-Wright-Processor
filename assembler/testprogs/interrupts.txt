@@ -1,4 +1,4 @@
-lmr $F     "enable interrupts
+lmr #$F     "enable interrupts
 ldi 0,#0    "r0 <= 0
 add 0,#0    "r0 <= 0 throws zero interrupt
 ldi 0,#$7F  "r0 <= $7F
