@@ -27,13 +27,13 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     /////////////////////////
     // outputs
     ////////////////////////
-    reg [0:50] s;
-    output [0:50] s_w;
+    reg [0:51] s;
+    output [0:51] s_w;
     genvar j;
     generate
-    for(j=0;j<51;j=j+1)
+    for(j=0;j<52;j=j+1)
     begin:reverse_s
-        assign s_w[j] = s[50-j]; 
+        assign s_w[j] = s[51-j]; 
     end
     endgenerate
     
@@ -277,40 +277,16 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     /////////////////////////
     always @(posedge clk)
     begin
-        if(clr == 0)	state1 <= 0;
+        if(clr == 0)    state1 <= 0;
         else
         begin
         case(state1)
         T0:
-        begin
-            if(ps0r == 0) state1 <= T0;
-            else
-            begin
-                case(st1)
-                0:  state1 <= T1;
-                1:  state1 <= T3;
-                2:  state1 <= T5;
-                3:  state1 <= T8;
-                4:  state1 <= T11;
-                5:  state1 <= T12;
-                6:  state1 <= T14;
-                7:  state1 <= T15;
-                8:  state1 <= T17;
-                9:  state1 <= T18;
-                10: state1 <= T19;
-                11: state1 <= T20;
-                12: state1 <= T22;
-                13: state1 <= T24;
-                14: state1 <= T25;
-                15: state1 <= T26;
-                16: state1 <= T28;
-                default: state1 <= 0;
-                endcase
-            end
-        end
-        T1:   state1 <= T2;
+            if(ps0r ==1) state1 <= T32;
+            else         state1 <= T0;
+        T1:   state1 <= T0;//JW
         T2:   state1 <= T0;
-        T3:   state1 <= T4;
+        T3:   state1 <= T0;//JW
         T4:   state1 <= T0;
         T5:
             if(d_rdy == 1) state1 <= T6;
@@ -369,6 +345,27 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
         T29:
             if(hs_in == 1) state1 <= T29;
             else           state1 <= T0;
+        T32:
+            case(st1)
+            0:  state1 <= T18;
+            1:  state1 <= T3;
+            2:  state1 <= T5;
+            3:  state1 <= T8;
+            4:  state1 <= T11;
+            5:  state1 <= T12;
+            6:  state1 <= T14;
+            7:  state1 <= T15;
+            8:  state1 <= T17;
+            9:  state1 <= T1;
+            10: state1 <= T19;
+            11: state1 <= T20;
+            12: state1 <= T22;
+            13: state1 <= T24;
+            14: state1 <= T25;
+            15: state1 <= T26;
+            16: state1 <= T28;
+            default: state1 <= 0;
+            endcase
         default: state1 <= T0;
         endcase
         end
@@ -381,15 +378,15 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     begin
         case(state1)
             T0:  s[27:44] = 18'b100000000000000011;
-            T1:  s[27:44] = 18'b000000000000100011;
+            T1:  s[27:44] = 18'b100000000001100011;//JW
             T2:  s[27:44] = 18'b100000000001100011;
-            T3:  s[27:44] = 18'b010000000000100011;
+            T3:  s[27:44] = 18'b110000000001100011;//JW
             T4:  s[27:44] = 18'b100000000001100011;
-            T5:  s[27:44] = 18'b000000000000100011;
-            T6:  s[27:44] = 18'b001000000010111011;
+            T5:  s[27:44] = 18'b000000000010110011;//JW
+            T6:  s[27:44] = 18'b101000000011111011;//JW
             T7:  s[27:44] = 18'b101000000001100011;
-            T8:  s[27:44] = 18'b000000000110100011;
-            T9:  s[27:44] = 18'b001000000110111011;
+            T8:  s[27:44] = 18'b000000000110110011;//JW
+            T9:  s[27:44] = 18'b101000000111111011;//JW
             T10: s[27:44] = 18'b101000000001100011;
             T11: s[27:44] = 18'b100011011001100000;
             T12: s[27:44] = 18'b000000000000100011;
@@ -410,6 +407,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
             T27: s[27:44] = 18'b111000000001100000;
             T28: s[27:44] = 18'b000000000000100111;
             T29: s[27:44] = 18'b100000000001100100;
+            T32: s[27:44] = 18'b100000000000000011;
             default: s[27:44] = 18'b000000000000000000;
         endcase
     end
@@ -419,23 +417,26 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     ////////////////////////
     always @ (posedge clk)
     begin
-        if(clr == 0)	state2 <= 0;
+        if(clr == 0)    state2 <= 0;
         else
         begin
         case(state2)
         T0:
-            if(ps1r == 1)
-                case(st2)
-                    0:  state2 <= T1;
-                    1:  state2 <= T2;
-                    2:  state2 <= T3;
-                    default: state2 <= T0;
-                endcase
+            if(ps1r == 1)   state2 <= T4;
+            else            state2 <= T0;
+                
         T1:  state2 <= T0;
         T2:
             if(d_odv == 1)  state2 <= T0;
             else            state2 <= T2;
         T3:  state2 <= T0;
+        T4: case(st2)
+                    0:  state2 <= T0;
+                    1:  state2 <= T2;
+                    2:  state2 <= T3;
+                    3:  state2 <= T1;
+                    default: state2 <= T0;
+            endcase
         default: state2 <= T0;
         endcase
         end
@@ -447,11 +448,12 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     always @ (state2)
     begin
         case(state2)
-            T0: s[45:50] = 6'b010001;
-            T1: s[45:50] = 6'b010100;
-            T2: s[45:50] = 6'b101000;
-            T3: s[45:50] = 6'b010010;
-            default: s[45:50] = 6'b000000;
+            T0: s[45:51] = 7'b0100010;
+            T1: s[45:51] = 7'b0101001;
+            T2: s[45:51] = 7'b1010000;
+            T3: s[45:51] = 7'b0100100;
+            T4: s[45:51] = 7'b0100001;
+            default: s[45:51] = 7'b0000000;
         endcase
     end
     ////////////////////////////////
