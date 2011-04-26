@@ -518,7 +518,7 @@ alu_opr:            num_4 ',' num_4 {
                     num_4 ',' '#' num_8 {
                         //immediate addressing mode
                         two_word = true;
-                        $$ = "11" + $1 + "000000\n" + $4 + "00000000";
+                        $$ = "01" + $1 + "000000\n" + $4 + "00000000";
                     } |
                     
                     num_4 ',' '(' num_4 ')' {
