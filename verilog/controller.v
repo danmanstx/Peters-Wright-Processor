@@ -27,13 +27,13 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     /////////////////////////
     // outputs
     ////////////////////////
-    reg [0:50] s;
-    output [0:50] s_w;
+    reg [0:51] s;
+    output [0:51] s_w;
     genvar j;
     generate
-    for(j=0;j<51;j=j+1)
+    for(j=0;j<52;j=j+1)
     begin:reverse_s
-        assign s_w[j] = s[50-j]; 
+        assign s_w[j] = s[51-j]; 
     end
     endgenerate
     
@@ -284,9 +284,9 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
         T0:
             if(ps0r ==1) state1 <= T32;
             else         state1 <= T0;
-        T1:   state1 <= T2;
+        T1:   state1 <= T0;//JW
         T2:   state1 <= T0;
-        T3:   state1 <= T4;
+        T3:   state1 <= T0;//JW
         T4:   state1 <= T0;
         T5:
             if(d_rdy == 1) state1 <= T6;
@@ -378,15 +378,15 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     begin
         case(state1)
             T0:  s[27:44] = 18'b100000000000000011;
-            T1:  s[27:44] = 18'b000000000000100011;
+            T1:  s[27:44] = 18'b100000000001100011;//JW
             T2:  s[27:44] = 18'b100000000001100011;
-            T3:  s[27:44] = 18'b010000000000100011;
+            T3:  s[27:44] = 18'b110000000001100011;//JW
             T4:  s[27:44] = 18'b100000000001100011;
-            T5:  s[27:44] = 18'b000000000000100011;
-            T6:  s[27:44] = 18'b001000000010111011;
+            T5:  s[27:44] = 18'b000000000010110011;//JW
+            T6:  s[27:44] = 18'b101000000011111011;//JW
             T7:  s[27:44] = 18'b101000000001100011;
-            T8:  s[27:44] = 18'b000000000110100011;
-            T9:  s[27:44] = 18'b001000000110111011;
+            T8:  s[27:44] = 18'b000000000110110011;//JW
+            T9:  s[27:44] = 18'b101000000111111011;//JW
             T10: s[27:44] = 18'b101000000001100011;
             T11: s[27:44] = 18'b100011011001100000;
             T12: s[27:44] = 18'b000000000000100011;
@@ -448,11 +448,12 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     always @ (state2)
     begin
         case(state2)
-            T0: s[45:50] = 6'b010001;
-            T1: s[45:50] = 6'b010100;
-            T2: s[45:50] = 6'b101000;
-            T3: s[45:50] = 6'b010010;
-            default: s[45:50] = 6'b000000;
+            T0: s[45:51] = 7'b0100010;
+            T1: s[45:51] = 7'b0101001;
+            T2: s[45:51] = 7'b1010000;
+            T3: s[45:51] = 7'b0100100;
+            T4: s[45:51] = 7'b0100001;
+            default: s[45:51] = 7'b0000000;
         endcase
     end
     ////////////////////////////////
