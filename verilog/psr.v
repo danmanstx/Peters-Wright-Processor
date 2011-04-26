@@ -14,7 +14,7 @@
 //  load only Ri when ld_ri = 1
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module psr(in, out, c_left, c_right, ld_ri, clr, clk);
+module psr(in, out, c_left, c_right, ld_ri, bubble, clr, clk);
     parameter size = 34;
     parameter ri_lsb = 8;
     input [size-1:0] in;
@@ -23,6 +23,7 @@ module psr(in, out, c_left, c_right, ld_ri, clr, clk);
     input c_left;
     input c_right;
     input ld_ri;
+    input bubble;
     input clr;
     input clk;
     
@@ -33,9 +34,13 @@ module psr(in, out, c_left, c_right, ld_ri, clr, clk);
             out <= 0;
             in_data <= 0;
         end
+        else if(bubble == 1)
+        begin
+            in_data <= 0;
+        end
         else
         begin
-            if(ld_ri == 1)          //load ri
+            if(bubble == 0 && ld_ri == 1)          //load ri
             begin
                 in_data[ri_lsb-1:0] <= in_data[ri_lsb-1:0];
                 in_data[ri_lsb+7:ri_lsb] <= in[ri_lsb+7:ri_lsb];
