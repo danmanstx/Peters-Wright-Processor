@@ -248,6 +248,7 @@ void label_replace(string& s, int labelno, int count) {
     int offset = labels[labelno].addr - labels[labelno].instances[count];
     //check if 16 bit
     if(labels[labelno].is_six[count]) {
+        offset -= 1;
         if(offset > 31 || offset < -32) {
             yyerror_nonfatal("branch distance too large");
             return;
@@ -544,14 +545,14 @@ br_opr:             num_4 ',' num_6 {
                     
                     num_4 ',' LBL {
                         //direct addressing w/ label
-                        label_check(yytext,addr-1,true);
+                        label_check(yytext,addr,true);
                         flag_label_call = true;
                         $$ = "0" + $1 + "------";
                     } |
                     
                     '(' num_4 ')' ',' LBL {
                         //reg. indirect w/ label
-                        label_check(yytext,addr-1,true);
+                        label_check(yytext,addr,true);
                         flag_label_call = true;
                         $$ = "1" + $2 + "------";
                     };
