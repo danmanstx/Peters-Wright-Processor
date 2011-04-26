@@ -544,14 +544,14 @@ br_opr:             num_4 ',' num_6 {
                     
                     num_4 ',' LBL {
                         //direct addressing w/ label
-                        label_check(yytext,addr,true);
+                        label_check(yytext,addr-1,true);
                         flag_label_call = true;
                         $$ = "0" + $1 + "------";
                     } |
                     
                     '(' num_4 ')' ',' LBL {
                         //reg. indirect w/ label
-                        label_check(yytext,addr,true);
+                        label_check(yytext,addr-1,true);
                         flag_label_call = true;
                         $$ = "1" + $2 + "------";
                     };
