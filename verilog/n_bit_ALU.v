@@ -49,6 +49,7 @@ module n_bit_ALU(a, b, cin, ctrl, f, cout, v, z);
     
     wire [n:0] carry;
     wire [n-1:0] or_chain;
+    wire [n-1:0] b_not;
     wire [n-1:0] w_0;
     wire [n-1:0] w_1;
     wire [n-1:0] w_2;
@@ -68,8 +69,10 @@ module n_bit_ALU(a, b, cin, ctrl, f, cout, v, z);
     generate    //create bistlice instances
     for(i = 0; i < n; i = i + 1)
     begin:alu_loop
+        //selective inverter
+        xor XOR (b_not[i],b[i],cin);
         //ALU_bitslice(a,b,cin,ctrl,fout,cout);
-        ALU_bitslice BSLICE (a[i],b[i],carry[i],ctrl[1:0],w_0[i],carry[i+1]);
+        ALU_bitslice BSLICE (a[i],b_not[i],carry[i],ctrl[1:0],w_0[i],carry[i+1]);
     end
     for(i = 0; i < n - 1; i = i + 1)
     begin:or_loop
