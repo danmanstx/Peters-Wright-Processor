@@ -44,7 +44,17 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     wire [7:0]  rbra_out;
     wire        i_odv;
     wire        d_odv;
-    
+    //////////////////////////////
+    //  wires for monitoring
+    //////////////////////////////
+    wire [33:0] psr0_in_monitor;
+    assign psr0_in_monitor[3:0]   = ir_out[9:6];
+    assign psr0_in_monitor[7:4]   = ir_out[5:2];
+    assign psr0_in_monitor[15:8]  = psr0_in[7:0];
+    assign psr0_in_monitor[23:16] = icache_in[7:0];
+    assign psr0_in_monitor[28:24] = s[24:20];
+    assign psr0_in_monitor[32:29] = s[18:15];
+    assign psr0_in_monitor[33]    = s[19];
     ////////////--------------------------------------------------------------------------------------------
     // assigns for testing
     ////////////
@@ -53,7 +63,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     ////////////--------------------------------------------------------------------------------------------*/
     
     // functional units
-    RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    RAM_straightflow #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_bubblesort #(.d_width(16),.a_width(8))   I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
     //cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
     ls_reg #(.n(16))                    IR ( icache_in[23:8], s[2], g_clr, g_clk, ir_out[15:0]);                                         // 16 bit instruction register
@@ -97,8 +107,8 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     comparator #(.width(4))                CMP_B (psr0_out[7:4], psr1_out[5:2], psr1_out[22], cmp_out_b);             // comparator for mux 2x8 that feeds later into alu input B
     MUX_mxn #(.d_width(8),.s_lines(1))     MUX_A ({psr1_out[13:6],rdata0[7:0]}, cmp_out_a, mux_out_a[7:0]);           // 2x8 mux that feeds into alu_A_MUX
     MUX_mxn #(.d_width(8),.s_lines(1))     MUX_B ({psr1_out[13:6],rdata1[7:0]}, cmp_out_b, mux_out_b[7:0]);           // 2x8 mux that feeds into alu_B_MUX
-    MUX_mxn #(.d_width(8),.s_lines(2))     ALU_B_MUX ({rin_out,mdr_out[7:0],psr0_out[15:8],mux_out_b[7:0]}, {s[28],s[29]}, b[7:0]);   // 4x8 mux that feeds directly into alu input B
-    n_bit_ALU #(.n(8),.m(3))               ALU  (mux_out_a[7:0], b[7:0], s[10], psr0_out[32:29], f[7:0], cout, v, z);                       // this is the all powerful ALU
+    MUX_mxn #(.d_width(8),.s_lines(2))     ALU_B_MUX ({rin_out,mdr_out[7:0],psr0_out[15:8],mux_out_b[7:0]}, {s[29],s[28]}, b[7:0]);   // 4x8 mux that feeds directly into alu input B
+    n_bit_ALU #(.n(8),.m(3))               ALU  (mux_out_a[7:0], b[7:0], psr0_out[32], psr0_out[31:29], f[7:0], cout, v, z);                       // this is the all powerful ALU
     ls_reg #(.n(8))                        RIN  (bus_in[7:0], s[30], g_clr, g_clk, rin_out[7:0]);
     psr #(.size(25),.ri_lsb(14))           PSR1 ({s[44:43],psr0_out[33],branch_mux_out[7:0],f[7:0],psr0_out[7:4],cout,z,v},psr1_out[24:0], s[38], s[50], 1'b0, g_clr, g_clk);        // pipeline stage register one
     ls_reg #(.n(1))                        PC_W (pc_w_in, s[32], g_clr, g_clk, pc_w );
