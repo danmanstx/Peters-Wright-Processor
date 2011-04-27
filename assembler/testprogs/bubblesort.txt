@@ -24,7 +24,7 @@ ldi 1,#0
 ldi 0,#1
 
 forlbl:
-ldi 6,#10
+ldi 6,#9
 sub 6,0
 blt 6,forend
 
