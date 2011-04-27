@@ -1,0 +1,32 @@
+"NOTE!! requires stack depth of 4
+"r0 is passed as a parameter
+"r1 is the returned result
+"precondition: load a number 'n' into register r0
+"postconditon: writes the n+1 first fibonacci numbers into memory addresses 0:n
+
+ldi 0,#10  "fib(10)
+call fib
+end:
+jmp end   "clean end
+
+fib:
+bne 0,if0
+ldi 1,#0  "if r0==0 r1 := 0
+rts
+if0:
+mov 3,0
+sub 3,#1
+bne 3,if1
+ldi 1,#1  "if r0==1 r1 := 0
+rts
+if1:
+"left traversal
+sub 0,#1  "r1 := r1 - 1
+call fib
+"write to RAM
+mov (0),1
+"right traversal (is already calculated!)
+sub 0,#1  "r1 := r1 - 1
+mov 1,(0)
+add 0,#2  "r0 := r0 + 2
+rts

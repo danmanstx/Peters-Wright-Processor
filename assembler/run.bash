@@ -7,6 +7,8 @@ echo "building bubblesort"
 ./assembler -mi bubblesort testprogs/bubblesort.txt
 echo "building straightflow"
 ./assembler -mi straightflow testprogs/straightflow.txt
-rm interrupts subroutine bubblesort straightflow
+echo "building fibonacci"
+./assembler -mi fibonacci testprogs/fibonacci.txt
+rm interrupts subroutine bubblesort straightflow fibonacci
 mv *.v ../verilog
 
