@@ -1,27 +1,23 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: University of Kentucky
-// Engineers: Danny Peters and John Wright 
-// 
-// Create Date:    4/21/11
-// Design Name: 
-// Module Name:    stack
-// Project Name: 
-// Target Devices: 
-// Tool versions: 
-// Description: 
+///////////////////////////////////////////////////////////////////////////////////////
+//John Wright & Danny Peters
+//University of Kentucky
+//EE480 Spring 2011
+//DV Final Project
 //
-// Dependencies: 
+//stack.v
 //
-// Revision: 
-// Revision 0.01 - File Created
-// Additional Comments: 
+//A parameterized stack with a synchronous active low clear and synchronous peek.
+//    c    clr  funct
+//    x    0    clear register to 0s
+//    0    1    store
+//    1    1    load from input
 //
-//////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 module stack(peek, push, c, en, clk, clr);
     parameter width = 8;
     parameter depth = 1;
-    input                     c;                // this is the control line
+    input                     c;                // pop when c=1.  push when c=0.
     input                    en;                // this is the enable
     input                   clk;                // this is a clocked input
     input                   clr;                // this is for the global clear
@@ -41,6 +37,7 @@ module stack(peek, push, c, en, clk, clr);
             begin
                 data[i] <= 0;
             end
+            peek <= 0;
             ptr <= 0;
             full <= 0;
             empty <= 1;
@@ -56,7 +53,7 @@ module stack(peek, push, c, en, clk, clr);
             end
             else
             begin
-                if(c == 0)  //pop
+                if(c == 1)  //pop
                 begin
                     if(empty == 0)
                     begin
@@ -76,7 +73,7 @@ module stack(peek, push, c, en, clk, clr);
                         end
                     end
                 end
-                else       // c=1, push
+                else       // c=0, push
                 begin
                     if(empty == 1)
                     begin

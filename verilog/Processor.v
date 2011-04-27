@@ -22,7 +22,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     output [7:0] bus_out;     // this is an output called bus_out
     output       hs_out;     // this is another input used for handshaking
     //wires
-    wire [52:0]s;
+    wire [54:0]s;
     ///////////////////
     // stage one     //
     ///////////////////
@@ -45,6 +45,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     wire        i_odv;
     wire        d_odv;
     wire        bubble;
+    wire        stack_enable;
     ////////////--------------------------------------------------------------------------------------------
     // assigns for testing
     ////////////
@@ -65,7 +66,8 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     MUX_mxn #(.d_width(8),.s_lines(2))  PC_MUX_0 ( {interrupt_out[7:0],ipcr_out[7:0],peek_out[7:0],rbra_out[7:0]}, {s[7],s[6]}, pc_in[7:0]);      // 4x8 mux for program counter
     MUX_mxn #(.d_width(8),.s_lines(2))  PSR0_MUX ( {8'h00,sex_out[7:0],ir_out[9:2],ir_out[15:8]}, {s[13],s[12]}, psr0_in[7:0]);          // 4x8 mux for pipelined stage register instruction
     ls_reg #(.n(8))                     IPCR ( icache_in[7:0], s[3], g_clr, g_clk, ipcr_out[7:0]);                                       // 8 bit interrupt program counter  register
-    stack #(.width(8),.depth(2))        RETURN_STACK ( peek_out[7:0], icache_in[7:0], s[8], s[9], g_clk, g_clr);       // return stack
+    or                                  RS_OR (stack_enable, s[53], s[9]);
+    stack #(.width(8),.depth(2))        RETURN_STACK ( peek_out[7:0], icache_in[7:0], s[54], stack_enable, g_clk, g_clr);       // return stack
     psr #(.size(34),.ri_lsb(8))         PSR0( {s[19],s[18:15],s[24:20],icache_in[7:0],psr0_in[7:0],ir_out[5:2],ir_out[9:6]}, psr0_out[33:0], s[14], s[27], s[26], bubble, s[52], g_clr, g_clk); // pipeline stage register zero
     ls_reg #(.n(1))                     I_EN( s[11], s[10], g_clr, g_clk, ien_out);
  
@@ -148,6 +150,6 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     // MHVPIS
     ///////////////////
 
-    controller            CNTRL   (ir_out[15:10], g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s[52:0], psr0_out[28:24], psr1_out[24:23], pc_w);   // this is the controller
+    controller            CNTRL   (ir_out[15:10], g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s[54:0], psr0_out[28:24], psr1_out[24:23], pc_w);   // this is the controller
     MHVPIS                INT_SYS ( {psr1_out[1],psr1_out[0],s[25],ext_int}, mask_in, g_clr, ien_out, i_pending, interrupt_out[7:0]);                            // hardware vector priority interrupt system
 endmodule

@@ -42,7 +42,7 @@ module psr(in, out, c_left, c_right, ld_ri, bubble, bubble_clr, clr, clk);
         begin
             out <= 0;
             in_data <= 0;
-            bubble_reg <= 2;
+            bubble_reg <= 1;
         end
         else
         begin
