@@ -27,8 +27,8 @@ module RAM_bubblesort(addr, ce, clk, clr, rw, data);
     initial
     begin
         memory[0] = 16'b1010010000000000;
-        memory[1] = 16'b1010011111000000;
-        memory[2] = 16'b0000000100000000;
+        memory[1] = 16'b0011011111000000;
+        memory[2] = 16'b0000001000000000;
         memory[3] = 16'b1000110000000000;
         memory[4] = 16'b1010010001000000;
         memory[5] = 16'b0000001100000000;
@@ -291,8 +291,8 @@ module RAM_bubblesort(addr, ce, clk, clr, rw, data);
         begin
             data_out_reg <= 0;
             memory[0] <= 16'b1010010000000000;
-            memory[1] <= 16'b1010011111000000;
-            memory[2] <= 16'b0000000100000000;
+            memory[1] <= 16'b0011011111000000;
+            memory[2] <= 16'b0000001000000000;
             memory[3] <= 16'b1000110000000000;
             memory[4] <= 16'b1010010001000000;
             memory[5] <= 16'b0000001100000000;
