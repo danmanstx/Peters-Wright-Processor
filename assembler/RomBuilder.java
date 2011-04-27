@@ -164,15 +164,17 @@ public class RomBuilder {
                 );
 
             writer.write( FILEMID0 );
+            writer.write( "    initial\n    begin\n" );
 
             for( int i = 0; i < memlocs; i += 1 ) {
-                writer.write( "            memory[" + i + "] = " + d_width + "\'b" );
+                writer.write( "        memory[" + i + "] = " + d_width + "\'b" );
                 for( int j = 0; j < d_width; j += 1 ) {
                     writer.write( "" + data[i][j] );
                 }
                 writer.write( ";\n" );
             }
 
+            writer.write( "    end\n\n" );
             writer.write( FILEMID1 );
 
             for( int i = 0; i < memlocs; i += 1 ) {
