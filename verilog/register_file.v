@@ -11,7 +11,7 @@
 //write.  Has a synchronous active low clear.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module register_file(write, reg0addr, reg1addr, writeaddr, data_in, clr, clk, data0, data1);
+module register_file(write, reg0addr, reg1addr, writeaddr, data_in, clr, clk, data0, data1, reg0, reg1, reg2, reg3, reg4, reg5);
     parameter d_width = 8;          //register width
     parameter a_width = 4;          //address width (2**m) registers
     input write;                    //write data_in to writeaddr when write = 1
@@ -25,6 +25,21 @@ module register_file(write, reg0addr, reg1addr, writeaddr, data_in, clr, clk, da
     output [d_width-1:0] data1;     //read data 1
     reg [d_width-1:0] registers [2**a_width-1:0];   //register data
     integer i;
+    
+    /// test bench
+    output [7:0] reg0;
+    output [7:0] reg1;
+    output [7:0] reg2;
+    output [7:0] reg3;
+    output [7:0] reg4;
+    output [7:0] reg5;
+    
+    assign reg0 = registers[0];
+    assign reg1 = registers[1];
+    assign reg2 = registers[2];
+    assign reg3 = registers[3];
+    assign reg4 = registers[4];
+    assign reg5 = registers[5];
     
     //dual continuous read
     assign data0 = registers[reg0addr];
