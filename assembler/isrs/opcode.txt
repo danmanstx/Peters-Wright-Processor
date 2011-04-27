@@ -1,2 +1,2 @@
-ldi 16,#FF
+ldi 15,#$FF
 isr
