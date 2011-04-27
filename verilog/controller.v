@@ -329,7 +329,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
             if(d_rdy == 1) state1 <= T21;
             else           state1 <= T20;
         T21:
-            if(d_odv == 1) state1 <= T0;
+            if(d_odv == 1) state1 <= T30;
             else           state1 <= T21;
         T22:
             if(d_rdy == 1) state1 <= T23;
@@ -351,6 +351,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
         T29:
             if(hs_in == 1) state1 <= T29;
             else           state1 <= T0;
+        T30:   state1 <= 0;
         T32:
             case(st1)
             0:  state1 <= T18;
@@ -414,6 +415,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
             T27: s[27:44] = 18'b111000000001000000;
             T28: s[27:44] = 18'b000000000000000111;
             T29: s[27:44] = 18'b100000000001000100;
+            T30: //TODO;
             T32: s[27:44] = 18'b100001000000000011;
             default: s[27:44] = 18'b0000000000000000;
         endcase
