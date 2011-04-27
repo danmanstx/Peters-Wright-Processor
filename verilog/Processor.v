@@ -62,7 +62,8 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out, reg0, re
     output [7:0] reg5;
     
     // functional units
-    RAM_straightflow #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    RAM_fibonacci #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    //RAM_straightflow #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_subroutine #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_interrupts #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
@@ -76,7 +77,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out, reg0, re
     MUX_mxn #(.d_width(8),.s_lines(2))  PSR0_MUX ( {8'h00,sex_out[7:0],ir_out[9:2],ir_out[15:8]}, {s[13],s[12]}, psr0_in[7:0]);          // 4x8 mux for pipelined stage register instruction
     ls_reg #(.n(8))                     IPCR ( icache_in[7:0], s[3], g_clr, g_clk, ipcr_out[7:0]);                                       // 8 bit interrupt program counter  register
     or                                  RS_OR (stack_enable, s[53], s[9]);
-    stack #(.width(8),.depth(2))        RETURN_STACK ( peek_out[7:0], icache_in[7:0], s[54], stack_enable, g_clk, g_clr);       // return stack
+    stack #(.width(8),.depth(4))        RETURN_STACK ( peek_out[7:0], icache_in[7:0], s[54], stack_enable, g_clk, g_clr);       // return stack
     psr #(.size(34),.ri_lsb(8))         PSR0( {s[19],s[18:15],s[24:20],icache_in[7:0],psr0_in[7:0],ir_out[5:2],ir_out[9:6]}, psr0_out[33:0], s[14], s[27], s[26], bubble, s[52], g_clr, g_clk); // pipeline stage register zero
     ls_reg #(.n(1))                     I_EN( s[11], s[10], g_clr, g_clk, ien_out);
  
