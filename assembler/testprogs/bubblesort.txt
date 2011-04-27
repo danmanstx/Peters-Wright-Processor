@@ -1,7 +1,5 @@
-"initialize memory[0:9] to {5,3,9,0,4,7,1,2,8,6}
-lmr #0      "disable interrupts
-ldi 0,#5
-str 0,#0
+ldi 0,#5 "initialize memory block from 0-9
+str 0,#0 "with "random" data
 ldi 1,#3
 str 1,#1
 ldi 2,#9
@@ -19,32 +17,37 @@ str 7,#7
 ldi 8,#8
 str 8,#8
 ldi 9,#6
-str 9,#9
+str 9,#9 "end initialization
 
-ldi 10,#0   "for loop0 counter (i=0)
+begin:
+ldi 1,#0
+ldi 0,#1
 
-loop0:
-mov 11,10
-add 11,#1   "for loop1 counter (j=i+1)
-loop1:
-mov 0,(10)
-mov 1,(11)
-mov 2,1
-sub 2,0
-blt 2,if0
-jmp if0end
-if0:           "if begin
-mov 12,0
-mov 0,1
-mov 1,12
-mov (10),0
-mov (11),1
-if0end:        "end if
-add 11,#1
-mov 13,11
-sub 13,#10
-blt 13,loop1  "end loop1
-add 10,#1
-mov 13,10
-sub 13,#10
-blt 13,loop0  "end loop0
+forlbl:
+mov 6,0
+sub 6,#10
+bne 6,forend
+
+mov 3,0
+sub 3,#1
+mov 4,(0)
+mov 5,(3)
+mov 6,5
+sub 6,4
+
+blt 6,ifend
+mov 2,4
+mov 4,5
+mov 5,2
+ldi 1,#1
+mov (0),4
+mov (3),5
+
+ifend:
+add 0,#1
+jmp forlbl
+forend:
+bne 1,begin
+
+end:
+jmp end     "clean end (infinite loop)
