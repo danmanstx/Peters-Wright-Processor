@@ -40,7 +40,7 @@ public class RomBuilder {
         "//\n" +
         "///////////////////////////////////////////////////////////////////////////////////////\n";
 
-    public static final String FILEMID = 
+    public static final String FILEMID0 = 
         "    input [a_width-1:0] addr;           //address (m bits wide)\n" +
         "    input ce;                           //chip enable (func. when ce=1, HiZ when ce=0)\n" +
         "    input clk;                          //posedge clock\n" +
@@ -50,7 +50,9 @@ public class RomBuilder {
         "    reg [d_width-1:0] data_out_reg;     //data output register\n" +
         "    reg [d_width-1:0] memory [2**a_width-1:0];  //memory values\n" +
         "    wire bufctrl;                               //buffer control\n" +
-        "    \n" +
+        "    \n";
+    
+    public static final String FILEMID1 =
         "    //read/write synchronous loop\n" +
         "    always@(posedge clk)\n" +
         "    begin\n" +
@@ -161,7 +163,17 @@ public class RomBuilder {
                 "    parameter a_width = " + a_width + ";              //address width (2**m memory locations)\n"
                 );
 
-            writer.write( FILEMID );
+            writer.write( FILEMID0 );
+
+            for( int i = 0; i < memlocs; i += 1 ) {
+                writer.write( "            memory[" + i + "] = " + d_width + "\'b" );
+                for( int j = 0; j < d_width; j += 1 ) {
+                    writer.write( "" + data[i][j] );
+                }
+                writer.write( ";\n" );
+            }
+
+            writer.write( FILEMID1 );
 
             for( int i = 0; i < memlocs; i += 1 ) {
                 writer.write( "            memory[" + i + "] <= " + d_width + "\'b" );
