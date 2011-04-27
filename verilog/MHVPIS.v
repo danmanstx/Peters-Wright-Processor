@@ -36,17 +36,14 @@ module MHVPIS(irupt_in, mask_in, clr, enable, i_pending, PC_out);
     encoder ENCODER0 (w_mask,enable,encoder_out,i_pending);
     //Choose PC_out
     MUX_mxn #(.d_width(8),.s_lines(2)) PCMUX (addresses,encoder_out,PC_out);
-
-    //during system-wide clear (initialization) set address registers
-    always@(clr)
+    
+    //addresses for isrs
+    initial
     begin
-        if(clr == 0)
-        begin
-            addresses[7:0] = 8'b00010001;   //isr0 --> zero ALU out interrupt service routine
-            addresses[15:8] = 8'b00110011;  //isr1 --> arithmetic overflow interrupt service routine
-            addresses[23:16] = 8'b11110000; //isr2 --> illegal opcode interrupt service routine
-            addresses[31:24] = 8'b10101010; //isr3 --> external interrupt service routine
-        end
+        addresses[7:0] = 8'd200;   //isr0 --> zero ALU out interrupt service routine
+        addresses[15:8] = 8'd210;  //isr1 --> arithmetic overflow interrupt service routine
+        addresses[23:16] = 8'd220; //isr2 --> illegal opcode interrupt service routine
+        addresses[31:24] = 8'd230; //isr3 --> external interrupt service routine
     end
     
 endmodule
