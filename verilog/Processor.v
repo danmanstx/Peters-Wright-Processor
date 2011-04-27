@@ -62,9 +62,9 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out, reg0, re
     output [7:0] reg5;
     
     // functional units
-    RAM_fibonacci #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    //RAM_fibonacci #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_straightflow #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
-    //RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_subroutine #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_interrupts #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //--for cache--
