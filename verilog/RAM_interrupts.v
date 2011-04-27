@@ -283,6 +283,7 @@ module RAM_interrupts(addr, ce, clk, clr, rw, data);
         memory[254] = 16'b0000000000000000;
         memory[255] = 16'b0000000000000000;
     end
+
     //read/write synchronous loop
     always@(posedge clk)
     begin

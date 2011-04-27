@@ -24,7 +24,9 @@ if1:
 sub 0,#1  "r1 := r1 - 1
 call fib
 "write to RAM
-mov (0),1
+mov 3,0
+sub 3,#1
+mov (3),1
 "right traversal (is already calculated!)
 sub 0,#1  "r1 := r1 - 1
 mov 4,(0)
