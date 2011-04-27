@@ -34,5 +34,5 @@ mv out_debug.txt straightflow_debug.txt
 echo "building test program: fibonacci..."
 ./assembler -mi fibonacci.asm testprogs/fibonacci.txt
 mv out_debug.txt fibonacci_debug.txt
-#mv *.v ../verilog
+mv *.v ../verilog
 
