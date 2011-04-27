@@ -24,9 +24,9 @@ ldi 1,#0
 ldi 0,#1
 
 forlbl:
-mov 6,0
-sub 6,#10
-bne 6,forend
+ldi 6,#10
+sub 6,0
+blt 6,forend
 
 mov 3,0
 sub 3,#1
