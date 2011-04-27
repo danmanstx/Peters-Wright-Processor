@@ -11,7 +11,7 @@
 //                  functional units are called and connected here.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
+module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out, reg0, reg1, reg2, reg3, reg4, reg5);
     // inputs
     input [7:0]  bus_in;      // this is an input that is called bus_in
     input        hs_in;       // this is an input used for handshaking
@@ -52,12 +52,21 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     assign i_odv=1;
     assign d_odv=1;
     ////////////--------------------------------------------------------------------------------------------*/
+    // test bench things
+    ///////////////////////////
+    output [7:0] reg0;
+    output [7:0] reg1;
+    output [7:0] reg2;
+    output [7:0] reg3;
+    output [7:0] reg4;
+    output [7:0] reg5;
     
     // functional units
-    //RAM_straightflow #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    RAM_straightflow #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
-    RAM_subroutine #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    //RAM_subroutine #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_interrupts #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    //--for cache--
     //RAM_bubblesort #(.d_width(16),.a_width(8))   I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
     //cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
     ls_reg #(.n(16))                    IR ( icache_in[23:8], s[2], g_clr, g_clk, ir_out[15:0]);                                         // 16 bit instruction register
@@ -98,7 +107,7 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out);
     wire        and_out;
 
     //functional units
-    register_file                          REG_FILE ( s[48],psr0_out[3:0], psr0_out[7:4], psr1_out[5:2], psr1_out[13:6], g_clr, g_clk, rdata0[7:0], rdata1[7:0]);      // register file 
+    register_file                          REG_FILE ( s[48],psr0_out[3:0], psr0_out[7:4], psr1_out[5:2], psr1_out[13:6], g_clr, g_clk, rdata0[7:0], rdata1[7:0], reg0, reg1, reg2, reg3, reg4, reg5);      // register file 
     comparator #(.width(4))                CMP_A (psr0_out[3:0], psr1_out[5:2], and_out, cmp_out_a);             // comparator for mux 2x8 that feeds later into alu input A
     comparator #(.width(4))                CMP_B (psr0_out[7:4], psr1_out[5:2], and_out, cmp_out_b);             // comparator for mux 2x8 that feeds later into alu input B
     MUX_mxn #(.d_width(8),.s_lines(1))     MUX_A ({psr1_out[13:6],rdata0[7:0]}, cmp_out_a, mux_out_a[7:0]);           // 2x8 mux that feeds into alu_A_MUX
