@@ -29,6 +29,7 @@ module MHVPIS(irupt_in, mask_in, clr, enable, i_pending, PC_out, clk, i_clr);
     wire [1:0] encoder_out;             //output from 4-bit priority encoder
     reg [31:0] addresses;               //ISR addresses
     reg [3:0] irupt_reg;                //interrupt register
+    wire i_pending_w;
     
     and (w_mask[0],irupt_reg[0],mask_in[0]);
     and (w_mask[1],irupt_reg[1],mask_in[1]);
@@ -36,7 +37,8 @@ module MHVPIS(irupt_in, mask_in, clr, enable, i_pending, PC_out, clk, i_clr);
     and (w_mask[3],irupt_reg[3],mask_in[3]);
     
     //module encoder(in,enable,out,valid);
-    encoder ENCODER0 (w_mask,enable,encoder_out,i_pending);
+    encoder ENCODER0 (w_mask,1'b1,encoder_out,i_pending_w);
+    and (i_pending, i_pending_w, enable);
     //Choose PC_out
     MUX_mxn #(.d_width(8),.s_lines(2)) PCMUX (addresses,encoder_out,PC_out);
     
