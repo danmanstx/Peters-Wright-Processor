@@ -14,7 +14,7 @@
 //    1    1    load from input
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module stack(peek, push, c, en, clk, clr);
+module stack(peek, push, c, en, clk, clr, stackpointer);
     parameter width = 8;
     parameter depth = 1;
     input                     c;                // pop when c=1.  push when c=0.
@@ -27,6 +27,9 @@ module stack(peek, push, c, en, clk, clr);
     reg     empty;                              // output that is 1 when the stack isn't empty and 0 when it is
     reg     [depth-1:0]  ptr;                   // stack pointer
     reg     [width-1:0] data [(2**depth)-1:0];  // this is a register that holds the data
+    output [3:0] stackpointer;
+    assign stackpointer = ptr;
+    
     integer i;
     
     always @(posedge clk)

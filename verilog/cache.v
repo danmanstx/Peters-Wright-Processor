@@ -12,7 +12,8 @@
 //The cache delay is modeled using a FSM.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out, odv, clr, clk);
+module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out, odv, clr, clk,
+             hit, data0, data1, data2, data3, addr0, addr1, addr2, addr3);
     //parameters
     parameter d_width = 8;      //data bus width
     parameter a_width = 8;      //address line width
@@ -47,7 +48,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
 
     //other registers and wires
     reg [3:0] state;
-    wire hit;                       //hit=1 for a hit, hit=0 for a miss
+    output hit;                       //hit=1 for a hit, hit=0 for a miss
     wire [1:0] sel;                 //sel=i if hit at entry i
     reg [1:0] sel_reg;              //register to store sel between ccs
     wire [3:0] dec;                 //dec[i]=1 if decrementing cnt[i]
@@ -64,6 +65,23 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
     assign w_cnt[3:2] = cnt[1];
     assign w_cnt[5:4] = cnt[2];
     assign w_cnt[7:6] = cnt[3];
+    
+    output [7:0] data0;
+    assign data0 = data[0];
+    output [7:0] data1;
+    assign data1 = data[1];
+    output [7:0] data2;
+    assign data2 = data[2];
+    output [7:0] data3;
+    assign data3 = data[3];
+    output [7:0] addr0;
+    assign addr0 = addr[0];
+    output [7:0] addr1;
+    assign addr1 = addr[1];
+    output [7:0] addr2;
+    assign addr2 = addr[2];
+    output [7:0] addr3;
+    assign addr3 = addr[3];
     
     //modules
     determine_hit DETERMINE_HIT (addr_in, w_addr, w_cnt, valid, sel, dec, hit);
@@ -93,19 +111,6 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
 
     always@(posedge clk)
     begin
-        if(clr == 0)
-        begin
-            rw_in_reg <= 0;
-            data_in_reg <= 0;
-            addr_in_reg <= 0;
-            for(i = 0; i < 4; i = i + 1)
-            begin
-                valid[i] <= 0;
-                cnt[i] <= 0;
-                data[i] <= 0;
-                addr[i] <= 0;
-            end
-        end
         if(clr == 0 || ce_in == 0)
         begin
             state <= 0;

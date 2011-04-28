@@ -14,7 +14,8 @@
 module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, reg1, reg2, reg3, reg4, reg5,
                   reg6, reg7, reg8, reg9, reg10, reg11, reg12, reg13, reg14, reg15, ir_out, Program_counter,
                   mem0, mem1, mem2, mem3, mem4, mem5, mem6, mem7, mem8, mem9, mem10, mem11, mem12, mem13, mem14, 
-                  mem15, a, b, f, opcode, state1, state2, state3 );
+                  mem15, a, b, f, opcode, state1, state2, state3, stackpointer, cache_hit, data0, data1, data2, data3,
+                  addr0, addr1, addr2, addr3);
     // inputs
     input [7:0]  bus_in;      // this is an input that is called bus_in
     input        hs_in;       // this is an input used for handshaking
@@ -53,7 +54,7 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     ////////////--------------------------------------------------------------------------------------------
     // assigns for testing
     ////////////
-    assign i_odv=1;
+    //assign i_odv=1;
     assign d_odv=1;
     ////////////--------------------------------------------------------------------------------------------*/
     // test bench things
@@ -108,6 +109,19 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     output [5:0] state1;
     output [5:0] state2;
     output [5:0] state3;
+    // stack pointer
+    output [3:0] stackpointer;
+    // cache hit and miss
+    output      cache_hit;
+    output [7:0] data0;
+    output [7:0] data1;
+    output [7:0] data2;
+    output [7:0] data3;
+
+    output [7:0] addr0;
+    output [7:0] addr1;
+    output [7:0] addr2;
+    output [7:0] addr3;
     //different ram fiels to load different programs
     ///////////////////////////////////////////////
     
@@ -123,7 +137,8 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     ////////////////////////////////////////////////
     RAM_fibonacci #(.d_width(16),.a_width(8))   I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
     cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], 
-                                                 iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
+                                                 iram_in[9], iram_in[8], i_odv, g_clr, g_clk, cache_hit, data0, data1, data2,
+                                                 data3, addr0, addr1, addr2, addr3); // 4x16 instruction cache
     
     
     ///////////////////////////////////////////////
