@@ -108,12 +108,10 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     output [5:0] state1;
     output [5:0] state2;
     output [5:0] state3;
-    
-    ///////////////////////////////////////////////
     //different ram fiels to load different programs
     ///////////////////////////////////////////////
     
-    RAM_test #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    //RAM_test #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_fibonacci #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_straightflow #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
@@ -123,11 +121,10 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     ////////////////////////////////////////////////
     // RAM AND CACHE
     ////////////////////////////////////////////////
-     //RAM_bubblesort #(.d_width(16),.a_width(8))   I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
-    //cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], 
-    //                                             iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
+    RAM_fibonacci #(.d_width(16),.a_width(8))   I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
+    cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], 
+                                                 iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
     
-
     
     ///////////////////////////////////////////////
     // functional units for stage one
@@ -203,7 +200,8 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     wire        or_out;
     // functional units
     ls_reg #(.n(4))                     IR_MASK ( psr1_out[21:18], s[49], g_clr, g_clk, mask_in[3:0]);                 // IR mask register
-    //RAM #(.d_width(8),.a_width(8))    D_RAM   ( dram_in[7:0], dram_in[8], g_clk, g_clr, dram_in[9], dram_in[17:10]);   // 256x8 data random access memory
+    //RAM #(.d_width(8),.a_width(8))    D_RAM   ( dram_in[7:0], dram_in[8], g_clk, g_clr, dram_in[9], dram_in[17:10], mem0, mem1, mem2, mem3, mem4, mem5,
+    //                                              mem6, mem7, mem8, mem9, mem10, mem11, mem12, mem13, mem14, mem15 );   // 256x8 data random access memory
     RAM #(.d_width(8),.a_width(8))      D_RAM   ( dcache_addr_in[7:0], or_out, g_clk, g_clr, s[46], buffer_out[7:0], mem0, mem1, mem2, mem3, mem4, mem5,
                                                   mem6, mem7, mem8, mem9, mem10, mem11, mem12, mem13, mem14, mem15 );   // 256x8 data random access memory
     //cache                             D_CACHE ( dcache_addr_in[7:0], buffer_out[7:0], s[46], or_out, dram_in[7:0], dram_in[17:10], dram_in[9], dram_in[8], d_odv, g_clr, g_clk);  // 4x8 data cache

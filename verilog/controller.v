@@ -484,7 +484,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     ////////////////////////////////
     // always block to set ps0r
     ////////////////////////////////
-    always @ (state0)
+    always @ (posedge clk)
     begin
         if(state0 == 0)     ps0r = 1;
         else                ps0r = 0;

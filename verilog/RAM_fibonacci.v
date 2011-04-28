@@ -291,7 +291,7 @@ module RAM_fibonacci(addr, ce, clk, clr, rw, data);
         begin
             data_out_reg <= 0;
             memory[0] <= 16'b1010010000000000;
-            memory[1] <= 16'b0000110000000000;
+            memory[1] <= 16'b0000101000000000;
             memory[2] <= 16'b1000010000010100;
             memory[3] <= 16'b1001100000000100;
             memory[4] <= 16'b1000000000010000;

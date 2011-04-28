@@ -68,13 +68,6 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
     //modules
     determine_hit DETERMINE_HIT (addr_in, w_addr, w_cnt, valid, sel, dec, hit);
     
-    
-    genvar j;
-    wire i_bufc;    //in buffer control
-    wire o_bufc;    //out buffer control
-
-    assign i_bufc = ~rw_in;
-    assign o_bufc = rw_out;
 
     initial
     begin
@@ -83,6 +76,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
         data_inout_reg = 0;
         data_out_reg = 0;
         addr_in_reg = 0;
+        addr_out = 0;
         state = 0;
         sel_reg = 0;
         for(i = 0; i < 4; i = i + 1)
@@ -119,7 +113,6 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
         else
         begin
             case(state)
-            begin
             0:  if(hit == 1)
                     state <= 0;
                 else if(valid[sel] == 1)
@@ -127,12 +120,12 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 else
                     state <= 3;
             1:  state <= 2;
-            2:  if(rw_reg == 0)
+            2:  if(rw_in_reg == 0)
                     state <= 5;
                 else
                     state <= 8;
             3:  state <= 4;
-            4:  if(rw_reg == 0)
+            4:  if(rw_in_reg == 0)
                     state <= 5;
                 else
                     state <= 8;
@@ -238,14 +231,19 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 odv <= 0;
                 ce_out <= 0;
             end
-            7:      //read from RAM to cache
+            7:      //do nothing
+            begin
+                odv <= 0;
+                ce_out <= 0;
+            end
+            8:      //read from RAM to cache
             begin
                 odv <= 0;
                 ce_out <= 1;
                 rw_out <= 1;
                 addr_out <= addr_in_reg;
             end
-            8:
+            9:
             begin
                 odv <= 0;
                 ce_out <= 1;
@@ -260,11 +258,6 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                         cnt[i] <= cnt[i] - 1;
                 end
             end
-            9:      //do nothing
-            begin
-                odv <= 0;
-                ce_out <= 0;
-            end
             10:     //do nothing
             begin
                 odv <= 0;
@@ -274,6 +267,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
             begin
                 odv <= 0;
                 ce_out <= 0;
+                data_inout_reg <= data[sel_reg];
             end
             12:     //data is valid
             begin
@@ -282,15 +276,22 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                 data_inout_reg <= data[sel_reg];
             end
             default:
+            begin
+                odv <= 1;
+                ce_out <= 0;
+            end
             endcase
         end
     end
 
+    
+    genvar j;
+    
     generate
     for(j = 0; j < d_width; j = j + 1)
     begin:buffers
-        bufif1 (data_out[j],data_out_reg[j],o_bufc);
-        bufif1 (data_in[j],data_inout_reg[j],i_bufc);
+        bufif0 (data_out[j],data_out_reg[j],rw_out);
+        bufif1 (data_in[j],data_inout_reg[j],rw_in);
     end
     endgenerate
 
