@@ -11,13 +11,13 @@ echo "assembling interrupt service routines..."
 ./assembler opcode.bin isrs/opcode.txt
 ./assembler ext_int.bin isrs/ext_int.txt
 echo "@200" > isrcode/isr0
-cat v.bin >> isrcode/isr0
+cat z.bin >> isrcode/isr0
 echo "@210" > isrcode/isr1
 cat v.bin >> isrcode/isr1
 echo "@220" > isrcode/isr2
-cat v.bin >> isrcode/isr2
+cat opcode.bin >> isrcode/isr2
 echo "@230" > isrcode/isr3
-cat v.bin >> isrcode/isr3
+cat ext_int.bin >> isrcode/isr3
 
 echo "building test program: interrupts..."
 ./assembler -mi interrupts.asm testprogs/interrupts.txt
