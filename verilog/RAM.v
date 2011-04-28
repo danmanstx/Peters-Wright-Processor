@@ -11,7 +11,8 @@
 //longer read time that a true RAM would take, a hardware counter is used in the cache.
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module RAM(addr, ce, clk, clr, rw, data);
+module RAM( addr, ce, clk, clr, rw, data, mem0, mem1, mem2, mem3, mem4, mem5, mem6, mem7, mem8, mem9, mem10, mem11,
+            mem12, mem13, mem14, mem15 );
     parameter d_width = 8;              //data bus width
     parameter a_width = 8;              //address width (2**m memory locations)
     input [a_width-1:0] addr;           //address (m bits wide)
@@ -24,6 +25,42 @@ module RAM(addr, ce, clk, clr, rw, data);
     reg [d_width-1:0] memory [2**a_width-1:0];  //memory values
     wire bufctrl;                               //buffer control
     integer i;
+    
+    output [7:0] mem0;
+    assign mem0 = memory[0];
+    output [7:0] mem1;
+    assign mem1 = memory[1];
+    output [7:0] mem2;
+    assign mem2 = memory[2];
+    output [7:0] mem3;
+    assign mem3 = memory[3];
+    output [7:0] mem4;
+    assign mem4 = memory[4];
+    output [7:0] mem5;
+    assign mem5 = memory[5];
+    output [7:0] mem6;
+    assign mem6 = memory[6];
+    output [7:0] mem7;
+    assign mem7 = memory[7];
+    output [7:0] mem8;
+    assign mem8 = memory[8];
+    output [7:0] mem9;
+    assign mem9 = memory[9];
+    output [7:0] mem10;
+    assign mem10 = memory[10];
+    output [7:0] mem11;
+    assign mem11 = memory[11];
+    output [7:0] mem12;
+    assign mem12 = memory[12];
+    output [7:0] mem13;
+    assign mem13 = memory[13];
+    output [7:0] mem14;
+    assign mem14 = memory[14];
+    output [7:0] mem15;
+    assign mem15 = memory[15];
+    
+    
+    
     
     //read/write synchronous loop
     always@(posedge clk)
