@@ -14,7 +14,7 @@
 module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, reg1, reg2, reg3, reg4, reg5,
                   reg6, reg7, reg8, reg9, reg10, reg11, reg12, reg13, reg14, reg15, ir_out, Program_counter,
                   mem0, mem1, mem2, mem3, mem4, mem5, mem6, mem7, mem8, mem9, mem10, mem11, mem12, mem13, mem14, 
-                  mem15, a, b, f );
+                  mem15, a, b, f, opcode, state1, state2, state3 );
     // inputs
     input [7:0]  bus_in;      // this is an input that is called bus_in
     input        hs_in;       // this is an input used for handshaking
@@ -103,17 +103,22 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     wire   [7:0] mux_out_a;
     assign a = mux_out_a[7:0];
     output [7:0] f;
+    // opcode and states
+    output [5:0] opcode;
+    output [5:0] state1;
+    output [5:0] state2;
+    output [5:0] state3;
     
     ///////////////////////////////////////////////
     //different ram fiels to load different programs
     ///////////////////////////////////////////////
     
     //RAM_test #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
-    RAM_fibonacci #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    //RAM_fibonacci #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_straightflow #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_subroutine #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
-    //RAM_interrupts #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    RAM_interrupts #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     
     ////////////////////////////////////////////////
     // RAM AND CACHE
@@ -222,6 +227,6 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     // MHVPIS
     ///////////////////
 
-    controller            CNTRL   (ir_out[15:10], g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s[54:0], psr0_out[28:24], psr1_out[24:23], pc_w);   // this is the controller
+    controller            CNTRL   (ir_out[15:10], g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s[54:0], psr0_out[28:24], psr1_out[24:23], pc_w, opcode, state1, state2, state3 );   // this is the controller
     MHVPIS                INT_SYS ( {ext_int, s[25], v, z}, mask_in[3:0], g_clr, not_ien_out, i_pending, interrupt_out[7:0], g_clk, s[8]);                   // hardware vector priority interrupt system
 endmodule
