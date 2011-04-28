@@ -163,5 +163,5 @@ module Processor(bus_in, ext_int, bus_out, hs_in, g_clr, g_clk, hs_out, reg0, re
     ///////////////////
 
     controller            CNTRL   (ir_out[15:10], g_clr, g_clk, i_odv, d_odv, hs_out, hs_in, i_pending, s[54:0], psr0_out[28:24], psr1_out[24:23], pc_w);   // this is the controller
-    MHVPIS                INT_SYS ( {z, v, s[25],ext_int}, mask_in[3:0], g_clr, not_ien_out, i_pending, interrupt_out[7:0]);                            // hardware vector priority interrupt system
+    MHVPIS                INT_SYS ( {z, v, s[25],ext_int}, mask_in[3:0], g_clr, not_ien_out, i_pending, interrupt_out[7:0], g_clk, s[8]);                   // hardware vector priority interrupt system
 endmodule
