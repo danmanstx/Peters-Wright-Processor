@@ -1,10 +1,12 @@
+"TEST PROGRAM---------------------------------
+"----------------FIBONACCI-------------------
 "NOTE!! requires stack depth of 4
 "r0 is passed as a parameter
 "r1 is the returned result
 "precondition: load a number 'n' into register r0
 "postconditon: writes the n+1 first fibonacci numbers into memory addresses 0:n
 
-ldi 0,#12  "fib(12)
+ldi 0,#10  "fib(10)
 call fib
 mov(0),1
 end:

@@ -1,3 +1,7 @@
+"TEST PROGRAM--------------------------------
+"------------------SUBROUTINE----------------
+"if executes correctly r0 and m[0] should contain 64
+
 ldi  0,#0       "r0 <= 0
 call run8_outer "r0 <= 64
 str 0,#0        "m(0) <= r0

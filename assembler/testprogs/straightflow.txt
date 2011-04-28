@@ -1,3 +1,6 @@
+"TEST PROGRAM------------------------------
+"---------------STRAIGHT FLOW-------------
+"if executes correctly r0 should contain $0B
 lmr #0      "disable interrupts
 ldi 0,#$0F  "r0 <= $0F
 ldi 1,#$F0  "r1 <= $F0

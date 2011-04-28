@@ -1,3 +1,6 @@
+"TEST PROGRAM----------------------------------
+"----------------INTERRUPTS-------------------
+"if exectues correctly register r15 should contain $0F
 lmr #$F    "enable interrupts
 ldi 0,#1   "r0 <= 1
 ldi 1,#1
