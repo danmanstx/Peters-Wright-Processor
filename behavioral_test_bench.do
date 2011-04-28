@@ -2,6 +2,7 @@ onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -color Gray60 -format Logic -label {global clock} /Processor/g_clk
 add wave -noupdate -color Gray60 -format Logic -label {global clear} /Processor/g_clr
+add wave -noupdate -format Logic /Processor/ext_int
 add wave -noupdate -divider -height 50 {vv PC vv}
 add wave -noupdate -color Gold -format Literal -label {PC out} -radix hexadecimal /Processor/PC/out
 add wave -noupdate -format Literal -label {PC load input} -radix hexadecimal /Processor/PC/ld_in
@@ -15,11 +16,23 @@ add wave -noupdate -divider -height 30 {vv States vv}
 add wave -noupdate -color Red -format Literal -label {state 0} -radix unsigned /Processor/CNTRL/state0
 add wave -noupdate -color White -format Literal -label {state 1} -radix unsigned /Processor/CNTRL/state1
 add wave -noupdate -color Blue -format Literal -label {state 2} -radix unsigned /Processor/CNTRL/state2
+add wave -noupdate -divider -height 50 {vv ALU vv}
+add wave -noupdate -format Literal -label A -radix hexadecimal /Processor/ALU/a
+add wave -noupdate -format Literal -label B -radix hexadecimal /Processor/ALU/b
+add wave -noupdate -format Logic -label cin /Processor/ALU/cin
+add wave -noupdate -format Literal -label ctrl /Processor/ALU/ctrl
+add wave -noupdate -format Literal -label F -radix hexadecimal /Processor/ALU/f
+add wave -noupdate -divider -height 50 {vv MHVPIS vv}
+add wave -noupdate -format Literal -label {irupt in} /Processor/INT_SYS/irupt_in
+add wave -noupdate -format Literal -label {mask in} /Processor/INT_SYS/mask_in
+add wave -noupdate -format Logic /Processor/INT_SYS/enable
+add wave -noupdate -format Logic /Processor/INT_SYS/i_pending
+add wave -noupdate -format Literal /Processor/INT_SYS/PC_out
 add wave -noupdate -divider -height 50 {vv Stack vv}
 add wave -noupdate -format Logic -label push/pop /Processor/RETURN_STACK/c
 add wave -noupdate -format Logic -label enable /Processor/RETURN_STACK/en
 add wave -noupdate -format Literal -label {push (input)} -radix hexadecimal /Processor/RETURN_STACK/push
-add wave -noupdate -format Literal -label {peek (output)} -radix hexadecimal -expand /Processor/RETURN_STACK/peek
+add wave -noupdate -format Literal -label {peek (output)} -radix hexadecimal /Processor/RETURN_STACK/peek
 add wave -noupdate -format Logic -label {is full} /Processor/RETURN_STACK/full
 add wave -noupdate -format Logic -label {is empty} /Processor/RETURN_STACK/empty
 add wave -noupdate -format Literal -label {stack data} -radix hexadecimal /Processor/RETURN_STACK/data
@@ -44,7 +57,7 @@ add wave -noupdate -format Literal -label {PSR1 in} /Processor/PSR1/in
 add wave -noupdate -format Literal -label {PSR1 in data register} /Processor/PSR1/in_data
 add wave -noupdate -color White -format Literal -label {PSR1 out} /Processor/PSR1/out
 add wave -noupdate -divider -height 50 {vv Register File vv}
-add wave -noupdate -color {Dark Orchid} -format Literal -label {register data} -radix decimal -expand /Processor/REG_FILE/registers
+add wave -noupdate -color {Dark Orchid} -format Literal -label {register data} -radix decimal /Processor/REG_FILE/registers
 add wave -noupdate -format Logic -label {write line} /Processor/REG_FILE/write
 add wave -noupdate -format Literal -label {write data address} -radix unsigned /Processor/REG_FILE/writeaddr
 add wave -noupdate -format Literal -label {write data} -radix hexadecimal /Processor/REG_FILE/data_in
@@ -66,8 +79,8 @@ add wave -noupdate -format Literal -label {instruction out} /Processor/I_RAM/dat
 add wave -noupdate -divider -height 30 {vv select lines vv}
 add wave -noupdate -format Literal /Processor/s
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {68006 ps} 0}
-configure wave -namecolwidth 146
+WaveRestoreCursors {{Cursor 1} {885 ps} 0}
+configure wave -namecolwidth 256
 configure wave -valuecolwidth 61
 configure wave -justifyvalue left
 configure wave -signalnamewidth 0
@@ -80,7 +93,7 @@ configure wave -gridperiod 1
 configure wave -griddelta 40
 configure wave -timeline 0
 update
-WaveRestoreZoom {24514 ps} {25026 ps}
+WaveRestoreZoom {667 ps} {1126 ps}
 view wave 
 wave clipboard store
 wave modify -driver freeze -pattern constant -value 0 -starttime 0ps -endtime 10ps sim:/Processor/g_clr 
@@ -91,5 +104,6 @@ wave modify -driver freeze -pattern clock -initialvalue St0 -period 10ps -dutycy
 wave modify -driver freeze -pattern constant -value St1 -starttime 10ps -endtime 60000ps Edit:/Processor/g_clr 
 wave modify -driver freeze -pattern clock -initialvalue St0 -period 10ps -dutycycle 50 -starttime 0ps -endtime 60000ps Edit:/Processor/g_clk 
 wave modify -driver freeze -pattern clock -initialvalue St0 -period 10ps -dutycycle 50 -starttime 0ps -endtime 60000ps Edit:/Processor/g_clk 
+wave modify -driver freeze -pattern constant -value 0 -starttime 0ps -endtime 10000ps sim:/Processor/ext_int 
 [findWindow wave].tree collapseall -1
 wave clipboard restore
