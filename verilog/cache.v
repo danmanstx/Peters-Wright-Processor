@@ -76,6 +76,7 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
         data_inout_reg = 0;
         data_out_reg = 0;
         addr_in_reg = 0;
+        addr_out = 0;
         state = 0;
         sel_reg = 0;
         for(i = 0; i < 4; i = i + 1)
