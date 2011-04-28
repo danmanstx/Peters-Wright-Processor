@@ -59,7 +59,7 @@ add wave -noupdate -color Green -format Literal -label {Alu input A} /finaltbw/a
 add wave -noupdate -color Green -format Literal -label {Alu input B} /finaltbw/b
 add wave -noupdate -color Green -format Literal /finaltbw/f
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {4465411 ps} 0}
+WaveRestoreCursors {{Cursor 1} {3120449 ps} 0}
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -73,10 +73,12 @@ configure wave -gridperiod 1
 configure wave -griddelta 40
 configure wave -timeline 0
 update
-WaveRestoreZoom {2827838 ps} {3339838 ps}
+WaveRestoreZoom {2974632 ps} {3486632 ps}
 view wave 
 wave clipboard store
-wave modify -driver freeze -pattern constant -value 0 -starttime 0us -endtime 4us sim:/finaltbw/ext_int 
-wave modify -driver freeze -pattern constant -value 1 -starttime 4us -endtime 20us Edit:/finaltbw/ext_int 
+wave modify -driver freeze -pattern constant -value 1 -starttime 3300ns -endtime 100000ns sim:/finaltbw/hs_in 
+wave modify -driver freeze -pattern constant -value 0 -starttime 0ns -endtime 3300ns Edit:/finaltbw/hs_in 
+wave modify -driver freeze -pattern constant -value 1 -starttime 3080585ps -endtime 100000000ps Edit:/finaltbw/hs_in 
+wave modify -driver freeze -pattern constant -value 0 -starttime 3120450ps -endtime 100000000ps Edit:/finaltbw/hs_in 
 [findWindow wave].tree collapseall -1
 wave clipboard restore
