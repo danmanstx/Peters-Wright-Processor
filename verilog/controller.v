@@ -10,7 +10,7 @@
 //                  this is the controller
 //
 ///////////////////////////////////////////////////////////////////////////////////////
-module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w, st1, st2, pc_w);
+module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w, st1, st2, pc_w, opcode_out, state1_out, state2_out, state3_out);
     ////////////////////////
     // inputs
     ////////////////////////
@@ -24,11 +24,32 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     input         hs_in;
     input [4:0]   st1;
     input [1:0]   st2;
+    //////////////////////////////////////////
+    // register to hold state and next state
+    //////////////////////////////////////////
+    reg [5:0] state0;
+    reg [5:0] state1;
+    reg [5:0] state2;
+    reg ps0r;
+    reg ps1r;
+    reg ps2r;
+    reg d_rdy;
     /////////////////////////
     // outputs
     ////////////////////////
     reg [0:54] s;
     output [0:54] s_w;
+    output [5:0] opcode_out;
+    assign opcode_out = opcode;
+    output [5:0] state1_out;
+    assign state1_out = state0;
+    output [5:0] state2_out;
+    assign state2_out = state1;
+    output [5:0] state3_out;
+    assign state3_out = state2;
+    ///////////////////////////////////
+    // generate to flip select lines
+    ///////////////////////////////////
     genvar j;
     generate
     for(j=0;j<55;j=j+1)
@@ -59,16 +80,7 @@ module controller(opcode, clr, clk, i_odv, d_odv, hs_out, hs_in, i_pending, s_w,
     parameter T60=7'b0111100; parameter T61=7'b0111101; parameter T62=7'b0111110; parameter T63=7'b0111111;
     parameter T64=7'b1000000; parameter T65=7'b1000001; parameter T66=7'b1000010; parameter T67=7'B1000011;
     parameter T68=7'b1000100;
-    //////////////////////////////////////////
-    // register to hold state and next state
-    //////////////////////////////////////////
-    reg [5:0] state0;
-    reg [5:0] state1;
-    reg [5:0] state2;
-    reg ps0r;
-    reg ps1r;
-    reg ps2r;
-    reg d_rdy;
+    
     ///////////////////////////////////////////////////////
     // always block to begin state machine for first stage
     ///////////////////////////////////////////////////////
