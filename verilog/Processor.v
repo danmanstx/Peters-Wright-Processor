@@ -109,7 +109,7 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     ///////////////////////////////////////////////
     
     //RAM_test #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
-    RAM_fibonacci #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
+    //RAM_fibonacci #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_straightflow #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_bubblesort #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
     //RAM_subroutine #(.d_width(16),.a_width(8))     I_RAM (icache_in[7:0], s[1], g_clk, g_clr, s[0], icache_in[23:8] );   // 256x16 instruction random access memory
@@ -118,9 +118,9 @@ module Processor( bus_in, hs_in, g_clr, g_clk, ext_int, bus_out,  hs_out, reg0, 
     ////////////////////////////////////////////////
     // RAM AND CACHE
     ////////////////////////////////////////////////
-     //RAM_bubblesort #(.d_width(16),.a_width(8))   I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
-    //cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], 
-    //                                             iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
+    RAM_fibonacci #(.d_width(16),.a_width(8))   I_RAM (iram_in[7:0], iram_in[8], g_clk, g_clr, iram_in[9], iram_in[25:10] );   // 256x16 instruction random access memory
+    cache #(.d_width(16),.a_width(8))   I_CACHE (icache_in[7:0], icache_in[23:8], s[1], s[0], iram_in[7:0], iram_in[25:10], 
+                                                 iram_in[9], iram_in[8], i_odv, g_clr, g_clk); // 4x16 instruction cache
     
 
     
