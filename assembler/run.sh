@@ -19,6 +19,9 @@ cat opcode.bin >> isrcode/isr2
 echo "@230" > isrcode/isr3
 cat ext_int.bin >> isrcode/isr3
 
+echo "building test program: test..."
+./assembler -mi test.asm testprogs/test.txt
+mv out_debug.txt test_debug.txt
 echo "building test program: interrupts..."
 ./assembler -mi interrupts.asm testprogs/interrupts.txt
 mv out_debug.txt interrupts_debug.txt
