@@ -68,9 +68,35 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
     //modules
     determine_hit DETERMINE_HIT (addr_in, w_addr, w_cnt, valid, sel, dec, hit);
     
-    /////////////////////////////////////////
-    //FSM
-    /////////////////////////////////////////
+    
+    genvar j;
+    wire i_bufc;    //in buffer control
+    wire o_bufc;    //out buffer control
+
+    assign i_bufc = ~rw_in;
+    assign o_bufc = rw_out;
+
+    initial
+    begin
+        rw_in_reg = 0;
+        data_in_reg = 0;
+        data_inout_reg = 0;
+        data_out_reg = 0;
+        addr_in_reg = 0;
+        state = 0;
+        sel_reg = 0;
+        for(i = 0; i < 4; i = i + 1)
+        begin
+            valid[i] = 0;
+            cnt[i] = 0;
+            data[i] = 0;
+            addr[i] = 0;
+        end
+        rw_out = 0;
+        ce_out = 0;
+        odv = 0;
+    end
+
     always@(posedge clk)
     begin
         if(clr == 0)
@@ -78,6 +104,13 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
             rw_in_reg <= 0;
             data_in_reg <= 0;
             addr_in_reg <= 0;
+            for(i = 0; i < 4; i = i + 1)
+            begin
+                valid[i] <= 0;
+                cnt[i] <= 0;
+                data[i] <= 0;
+                addr[i] <= 0;
+            end
         end
         if(clr == 0 || ce_in == 0)
         begin
@@ -85,48 +118,37 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
         end
         else
         begin
-            rw_in_reg <= rw_in;
-            data_in_reg <= data_in;
-            addr_in_reg <= addr_in;
-            sel_reg <= sel;
             case(state)
-                0: begin
-                    if(hit == 1)
-                        state <= 0;
-                    else if(valid[sel_reg] == 1)
-                        state <= 1;     //write back to RAM if valid
-                    else
-                        state <= 11;    //don't do anything if not
-                end
-                1:  begin
-                    if(rw_in == 1)
-                        state <= 4; //read
-                    else 
-                        state <= 2; //write
-                end
-                2:  state <= 3;
-                3:  state <= 6;
-                4:  state <= 5;
-                5:  state <= 6;
-                6:  state <= 7;
-                7:  state <= 8;
-                8:  state <= 9;
-                9:  state <= 10;
-                10: state <= 0;
-                11: begin
-                    if(rw_in == 1)
-                        state <= 2; //read
-                    else
-                        state <= 4; //write
-                end
-                default: state <= 0;
+            begin
+            0:  if(hit == 1)
+                    state <= 0;
+                else if(valid[sel] == 1)
+                    state <= 1;
+                else
+                    state <= 3;
+            1:  state <= 2;
+            2:  if(rw_reg == 0)
+                    state <= 5;
+                else
+                    state <= 8;
+            3:  state <= 4;
+            4:  if(rw_reg == 0)
+                    state <= 5;
+                else
+                    state <= 8;
+            5:  state <= 6;
+            6:  state <= 7;
+            7:  state <= 11;
+            8:  state <= 9;
+            9:  state <= 10;
+            10: state <= 11;
+            11: state <= 12;
+            12: state <= 0;
+            default: state <= 0;
             endcase
         end
     end
     
-    /////////////////////////////////////////
-    //State outputs
-    /////////////////////////////////////////
     always@(negedge clk)
     begin
         if(clr == 0)
@@ -141,15 +163,16 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
         end
         if(ce_in == 1)
         begin
+            rw_in_reg <= rw_in;
+            data_in_reg <= data_in;
+            addr_in_reg <= addr_in;
+            sel_reg <= sel;
             case(state)
-            0:
+            0:  //initial state
             begin
                 ce_out <= 0;
                 rw_out <= 0;
-                data_out_reg <= 0;
-                addr_out <= 0;
-
-                if(hit == 1)    //hit
+                if(hit == 1) //hit
                 begin
                     odv <= 1;
                     if(dec[0] == 1 && sel != 0)
@@ -161,158 +184,113 @@ module cache(addr_in, data_in, rw_in, ce_in, addr_out, data_out, rw_out, ce_out,
                     if(dec[3] == 1 && sel != 3)
                         cnt[3] <= cnt[3] - 1;
                     cnt[sel] <= 2'b11;
-                    if(rw_in_reg == 0) //write
+                    if(rw_in_reg == 0)  //write
                         data[sel] <= data_in_reg;
-                    else        //read
+                    else
                         data_inout_reg <= data[sel];
                 end
-                else            //miss
+                else
                 begin
                     odv <= 0;
                 end
             end
-            1:
+            1:      //write back to RAM state
             begin
-                //write to RAM
                 odv <= 0;
                 ce_out <= 1;
                 rw_out <= 0;
                 data_out_reg <= data[sel_reg];
                 addr_out <= addr[sel_reg];
             end
-            2:
+            2:      //write back to RAM state 2
             begin
-                //write from bus to cache
                 odv <= 0;
-                ce_out <= 0;
+                ce_out <= 1;
                 rw_out <= 0;
-                data_out_reg <= 0;
-                addr_out <= 0;
-                data[sel_reg] <= data_in_reg;
-                valid[sel_reg] <= 1;
-                addr[sel_reg] <= addr_in_reg;
-                if(sel_reg != 0)
-                    cnt[0] <= cnt[0] - 1;
-                else
-                    cnt[0] <= 2'b11;
-                if(sel_reg != 1)
-                    cnt[1] <= cnt[1] - 1;
-                else
-                    cnt[1] <= 2'b11;
-                if(sel_reg != 2)
-                    cnt[2] <= cnt[2] - 1;
-                else
-                    cnt[2] <= 2'b11;
-                if(sel_reg != 3)
-                    cnt[3] <= cnt[3] - 1;
-                else
-                    cnt[3] <= 2'b11;
+                data_out_reg <= data[sel_reg];
+                addr_out <= addr[sel_reg];
             end
-            3:
+            3:      //do nothing
             begin
-                //do nothing
                 odv <= 0;
                 ce_out <= 0;
             end
-            4:
+            4:      //do nothing
             begin
-                //write from RAM to cache
+                odv <= 0;
+                ce_out <= 0;
+            end
+            5:      //write to cache from bus
+            begin
+                odv <= 0;
+                ce_out <= 0;
+                data[sel_reg] <= data_in_reg;
+                addr[sel_reg] <= addr_in_reg;
+                valid[sel_reg] <= 1;
+                for(i = 0; i < 4; i = i + 1)
+                begin
+                    if(valid[i] == 1)
+                        cnt[i] <= cnt[i] - 1;
+                end
+            end
+            6:      //do nothing
+            begin
+                odv <= 0;
+                ce_out <= 0;
+            end
+            7:      //read from RAM to cache
+            begin
                 odv <= 0;
                 ce_out <= 1;
                 rw_out <= 1;
-                data_out_reg <= data_in_reg;
                 addr_out <= addr_in_reg;
-            end
-            5:
-            begin
-                //write what is on the RAM lines
-                odv <= 0;
-                ce_out <= 0;
-                rw_out <= 0;
-                data_out_reg <= 0;
-                addr_out <= 0;
-                data[sel_reg] <= data_out;
-                //write data to cache bus
-                data_inout_reg <= data_out;
-                valid[sel_reg] <= 1;
-                addr[sel_reg] <= addr_in_reg;
-                if(sel_reg != 0)
-                    cnt[0] <= cnt[0] - 1;
-                else
-                    cnt[0] <= 2'b11;
-                if(sel_reg != 1)
-                    cnt[1] <= cnt[1] - 1;
-                else
-                    cnt[1] <= 2'b11;
-                if(sel_reg != 2)
-                    cnt[2] <= cnt[2] - 1;
-                else
-                    cnt[2] <= 2'b11;
-                if(sel_reg != 3)
-                    cnt[3] <= cnt[3] - 1;
-                else
-                    cnt[3] <= 2'b11;
-            end
-            6:
-            begin
-                //do nothing
-                odv <= 0;
-                ce_out <= 0;
-            end
-            7:
-            begin
-                //do nothing
-                odv <= 0;
-                ce_out <= 0;
             end
             8:
             begin
-                //do nothing
+                odv <= 0;
+                ce_out <= 1;
+                rw_out <= 1;
+                data[sel_reg] <= data_out;
+                addr[sel_reg] <= addr_in_reg;
+                valid[sel_reg] <= 1;
+                addr_out <= addr_in_reg;
+                for(i = 0; i < 4; i = i + 1)
+                begin
+                    if(valid[i] == 1)
+                        cnt[i] <= cnt[i] - 1;
+                end
+            end
+            9:      //do nothing
+            begin
                 odv <= 0;
                 ce_out <= 0;
             end
-            9:
+            10:     //do nothing
             begin
-                //do nothing
                 odv <= 0;
                 ce_out <= 0;
             end
-            10:
+            11:     //do nothing
             begin
-                //data is valid
+                odv <= 0;
+                ce_out <= 0;
+            end
+            12:     //data is valid
+            begin
                 odv <= 1;
                 ce_out <= 0;
-            end
-            11:
-            begin
-                //do nothing
-                odv <= 0;
-                ce_out <= 0;
+                data_inout_reg <= data[sel_reg];
             end
             default:
-            begin
-                //do nothing
-                odv <= 0;
-                ce_out <= 0;
-            end
             endcase
         end
-        else
-            odv <= 0;
     end
-
-    genvar j;
-    wire i_bufc;    //in buffer control
-    wire o_bufc;    //out buffer control
-
-    assign i_bufc = ~rw_in;
-    assign o_bufc = rw_out;
 
     generate
     for(j = 0; j < d_width; j = j + 1)
     begin:buffers
-        bufif1 (data_out,data_out_reg,o_bufc);
-        bufif1 (data_in,data_inout_reg,i_bufc);
+        bufif1 (data_out[j],data_out_reg[j],o_bufc);
+        bufif1 (data_in[j],data_inout_reg[j],i_bufc);
     end
     endgenerate
 
